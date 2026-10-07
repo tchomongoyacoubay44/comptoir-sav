@@ -1,0 +1,27 @@
+COMPTOIR SAV NOUR'S : METTRE L'APPLICATION EN LIGNE (GRATUIT)
+
+Ce dossier contient tout le jeu. Une fois en ligne, le lien s'ouvre pour tout le monde,
+sans compte, et s'installe sur le téléphone comme une application.
+
+1. Créez un compte gratuit sur github.com (« Sign up »).
+   Astuce : le nom d'utilisateur apparaît dans le lien. Exemple : noursmarket
+2. En haut à droite, touchez « + » puis « New repository ».
+   Repository name : comptoir-sav   ·   cochez « Public »   ·   « Create repository ».
+3. Sur la page qui s'ouvre, cliquez sur « uploading an existing file ».
+4. Glissez TOUS les fichiers de ce dossier (pas le .zip lui-même), puis « Commit changes ».
+5. Allez dans « Settings », puis « Pages » dans le menu de gauche.
+   Source : « Deploy from a branch »   ·   Branch : « main » et « / (root) »   ·   « Save ».
+6. Attendez une à deux minutes et rechargez la page « Pages » :
+   le lien du jeu s'affiche, par exemple https://noursmarket.github.io/comptoir-sav/
+7. Envoyez ce lien sur WhatsApp. Chacun l'ouvre dans Chrome ou Safari,
+   puis l'installe (onglet Équipe du jeu : mode d'emploi pour Android et iPhone).
+
+METTRE À JOUR PLUS TARD
+Dans votre dépôt GitHub : « Add file » puis « Upload files », glissez les nouveaux fichiers
+(mêmes noms), puis « Commit changes ». Les téléphones reçoivent la nouvelle version
+à l'ouverture suivante du jeu.
+
+À SAVOIR
+- Les scores restent sur chaque téléphone. Pour suivre l'équipe, chacun envoie son bilan
+  depuis l'onglet Équipe (bouton WhatsApp).
+- Le jeu marche sans Internet après la première ouverture.

@@ -1,0 +1,1653 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comptoir SAV NouR’s</title>
+<meta name="description" content="Jeu de formation au diagnostic SAV de NouR’s Market : décider, preuve à l’appui, si une panne est pour le vendeur, pour le client, ou s’il n’y a aucune panne.">
+<meta name="theme-color" content="#FCFCFA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#152026" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Comptoir SAV">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Saira+Condensed:wght@600;700;800&display=swap" crossorigin>
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+img{max-width:100%}
+.install-now{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-block:4px 8px}
+.installed-msg{font-weight:700;color:var(--aucune)}
+/* Établi : la fiche d’intervention (papier) à gauche, le tapis antistatique (les outils) à droite ; sur téléphone, une colonne et une barre d’onglets en bas comme une application */
+:root{
+  --bg:#E5EBEC;
+  --paper:#FCFCFA;
+  --paper-2:#F0F4F4;
+  --ink:#14232B;
+  --muted:#53646C;
+  --line:#C9D4D7;
+  --mat:#1B5560;
+  --mat-ink:#E8F3F3;
+  --mat-muted:#A9C9CC;
+  --mat-grid:rgba(232,243,243,.08);
+  --mat-chip:rgba(255,255,255,.07);
+  --mat-chip-hover:rgba(255,255,255,.14);
+  --mat-edge:rgba(232,243,243,.24);
+  --led:#DE9124;
+  --led-off:rgba(20,35,43,.11);
+  --on-led:#241600;
+  --vendeur:#B0302A;
+  --client:#1D57A0;
+  --aucune:#2A773A;
+  --alert-bg:#FBE8E6;
+  --backdrop:rgba(6,14,17,.58);
+  --shadow:0 1px 0 rgba(20,35,43,.05),0 12px 28px -18px rgba(20,35,43,.45);
+  --nav-shadow:0 -10px 24px -20px rgba(20,35,43,.5);
+  --f-display:"Saira Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1315; --paper:#152026; --paper-2:#1B2930; --ink:#E2EBED; --muted:#94A6AD; --line:#2B3C43;
+    --mat:#0F3A41; --mat-ink:#DCEDEE; --mat-muted:#8FB4B8; --mat-grid:rgba(220,237,238,.06);
+    --mat-chip:rgba(255,255,255,.05); --mat-chip-hover:rgba(255,255,255,.11); --mat-edge:rgba(220,237,238,.2);
+    --led:#EFB052; --led-off:rgba(226,235,237,.11); --on-led:#241600;
+    --vendeur:#EC756E; --client:#7FAEEF; --aucune:#6CC47E; --alert-bg:#3A1F1D;
+    --backdrop:rgba(0,0,0,.66);
+    --shadow:0 1px 0 rgba(0,0,0,.35),0 14px 30px -18px rgba(0,0,0,.85);
+    --nav-shadow:0 -10px 24px -18px rgba(0,0,0,.85);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1315; --paper:#152026; --paper-2:#1B2930; --ink:#E2EBED; --muted:#94A6AD; --line:#2B3C43;
+  --mat:#0F3A41; --mat-ink:#DCEDEE; --mat-muted:#8FB4B8; --mat-grid:rgba(220,237,238,.06);
+  --mat-chip:rgba(255,255,255,.05); --mat-chip-hover:rgba(255,255,255,.11); --mat-edge:rgba(220,237,238,.2);
+  --led:#EFB052; --led-off:rgba(226,235,237,.11); --on-led:#241600;
+  --vendeur:#EC756E; --client:#7FAEEF; --aucune:#6CC47E; --alert-bg:#3A1F1D;
+  --backdrop:rgba(0,0,0,.66);
+  --shadow:0 1px 0 rgba(0,0,0,.35),0 14px 30px -18px rgba(0,0,0,.85);
+  --nav-shadow:0 -10px 24px -18px rgba(0,0,0,.85);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+button,a,label{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--led);outline-offset:2px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.mono{font-family:var(--f-mono)}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ---------- Bandeau ---------- */
+.top{background:var(--paper);border-bottom:1px solid var(--line)}
+.top-in{max-width:1180px;margin-inline:auto;padding-inline:16px;padding-block:12px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px}
+.brand{display:flex;flex-direction:column;gap:3px;line-height:1.05}
+.brand-eyebrow{font:500 .7rem/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.wordmark{display:flex;align-items:center;gap:.4em;font:800 1.75rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.wordmark::before{content:"";flex:none;width:.36em;height:.36em;border-radius:50%;background:var(--led);box-shadow:0 0 0 .14em color-mix(in srgb,var(--led) 26%,transparent),0 0 .7em var(--led)}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--paper-2);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.tabs button{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:.92rem;padding:8px 14px;border-radius:999px;white-space:nowrap;cursor:pointer}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.player-slot:empty{display:none}
+.player-chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;max-width:100%;padding:4px 12px 4px 4px;border-radius:999px;border:1px solid var(--line);background:var(--paper-2);cursor:pointer;font-weight:700;font-size:.9rem}
+.player-chip:hover{border-color:var(--ink)}
+.player-chip .pc-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player-chip svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;color:var(--muted)}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:16px;padding-block:20px 64px}
+@media (min-width:700px){.wrap,.top-in{padding-inline:24px}}
+
+/* ---------- Barre d’onglets du téléphone ---------- */
+.bottomnav{display:none}
+.bottomnav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border:0;background:none;padding:4px 2px;border-radius:12px;color:var(--muted);font-size:.74rem;font-weight:700;line-height:1.1;cursor:pointer}
+.bn-ico{display:grid;place-items:center;width:46px;height:28px;border-radius:999px;transition:background-color .15s}
+.bottomnav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.bottomnav button[aria-current="page"]{color:var(--ink)}
+.bottomnav button[aria-current="page"] .bn-ico{background:var(--led-off);background:color-mix(in srgb,var(--led) 30%,transparent)}
+@media (max-width:720px){
+  .tabs{display:none}
+  .bottomnav{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:30;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:1px solid var(--line);box-shadow:var(--nav-shadow)}
+  body{padding-bottom:calc(68px + env(safe-area-inset-bottom,0px))}
+  .top-in{padding-block:10px;flex-wrap:nowrap}
+  .brand{min-width:0}
+  .wordmark{font-size:1.45rem;white-space:nowrap}
+  .brand-eyebrow{display:none}
+  .player-chip{min-width:0}
+}
+
+/* ---------- Boutons, champs ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);font-weight:700;font-size:.95rem;line-height:1.2;text-align:center;text-decoration:none;cursor:pointer;transition:border-color .15s,filter .15s,transform .1s}
+.btn:hover{border-color:var(--ink)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.btn.led{background:var(--led);border-color:var(--led);color:var(--on-led)}
+.btn.led:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:38px;padding:7px 12px;font-size:.88rem}
+.btn.danger{color:var(--vendeur)}
+.btn.danger.armed{background:var(--vendeur);border-color:var(--vendeur);color:var(--paper)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn svg,.ico svg,.x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.linkbtn{border:0;background:none;padding:6px 0;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:.88rem}
+.linkbtn.armed{color:var(--vendeur);font-weight:700}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:.92rem}
+.form-row{display:flex;flex-wrap:wrap;gap:10px}
+.input{flex:1 1 200px;min-width:0;min-height:48px;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:1.05rem}
+.input:focus-visible{outline:3px solid var(--led);outline-offset:1px;border-color:var(--ink)}
+.form-err{min-height:1.2em;color:var(--vendeur);font-size:.88rem;font-weight:700}
+
+/* ---------- Papier, tampons ---------- */
+.paper{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.pad{padding:20px}
+.kicker{font:500 .74rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.c-vendeur{--c:var(--vendeur)}
+.c-client{--c:var(--client)}
+.c-aucune{--c:var(--aucune)}
+.stamp{--c:var(--ink);--r:-4deg;--gap:var(--paper);display:inline-block;color:var(--c);font:800 1rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.07em;padding:.52em .78em .46em;border:2.5px solid var(--c);border-radius:5px;box-shadow:inset 0 0 0 2px var(--gap),inset 0 0 0 3.5px var(--c);transform:rotate(var(--r));white-space:nowrap}
+.stamp.big{font-size:clamp(1.15rem,3.6vw,1.55rem);border-width:3.5px;white-space:normal;text-align:center;max-width:100%}
+.r1{--r:-4deg}
+.r2{--r:2.5deg}
+.r3{--r:-1.5deg}
+@keyframes thump{0%{transform:rotate(-16deg) scale(1.8);opacity:0}55%{opacity:1}100%{transform:rotate(var(--r)) scale(1);opacity:1}}
+.stamp.thump{animation:thump .34s cubic-bezier(.2,.9,.3,1.15) .15s both}
+@media (prefers-reduced-motion:reduce){.stamp.thump{animation:none}*{transition:none!important}}
+.avatar{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--mat);color:var(--mat-ink);font:800 1.3rem var(--f-display)}
+.avatar.sm{width:34px;height:34px;font-size:1.05rem}
+.avatar.xs{width:30px;height:30px;font-size:.98rem}
+
+/* ---------- Accueil ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;align-items:center;padding-block:16px 4px}
+@media (max-width:860px){.hero{grid-template-columns:minmax(0,1fr)}}
+.hero h1{font:800 clamp(2.1rem,5.4vw,3.45rem)/.98 var(--f-display);text-transform:uppercase;letter-spacing:.005em;margin-block:10px 14px}
+.lead{font-size:1.08rem;color:var(--muted);max-width:56ch}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.legend{padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.legend ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.legend li{display:flex;flex-direction:column;align-items:flex-start;gap:7px}
+.legend li > span:last-child{color:var(--muted);font-size:.95rem}
+.sec-t{font:700 1.3rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px}
+.reflexes{margin-top:36px}
+.dashed-cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px}
+.dashed-cards li{padding:16px 18px;border-radius:12px;border:1px dashed var(--line);background:var(--paper-2);display:flex;flex-direction:column;gap:4px}
+.dashed-cards b{font:700 1.08rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.prog{margin-top:28px;padding:16px 20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px}
+.prog-stats{display:flex;flex-wrap:wrap;gap:12px 36px}
+.prog-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.stat{display:flex;flex-direction:column}
+.stat .k{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font:700 1.6rem/1.15 var(--f-display);font-variant-numeric:tabular-nums}
+.stat .v small{font-size:.6em;color:var(--muted);margin-left:2px}
+.level{margin-top:32px}
+.d-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.dossier{display:flex;flex-direction:column;gap:8px;text-align:left;padding:16px 18px;border-radius:12px;border:1px solid var(--line);background:var(--paper);box-shadow:var(--shadow);cursor:pointer;transition:transform .15s,border-color .15s}
+.dossier:hover{transform:translateY(-2px);border-color:var(--ink)}
+.dossier > span{display:block}
+.dossier .d-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.d-no{font:600 .76rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lvl{display:inline-flex;gap:3px}
+.lvl i{width:8px;height:8px;border-radius:50%;background:var(--led-off)}
+.lvl i.on{background:var(--led)}
+.d-title{font:700 1.3rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
+.d-meta{font-size:.88rem;color:var(--muted)}
+.dossier .d-quote{font-style:italic;font-size:.93rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.d-foot{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);font:500 .8rem var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.d-foot b{color:var(--ink);font-size:1rem}
+
+/* ---------- Bienvenue ---------- */
+.welcome{display:grid;place-items:center;padding-block:12px 24px}
+.welcome-card{width:100%;max-width:560px;padding:28px 24px;display:flex;flex-direction:column;gap:16px}
+.welcome-card h1{font:800 clamp(2.3rem,9vw,3.2rem)/.95 var(--f-display);text-transform:uppercase}
+.welcome-stamps{display:flex;flex-wrap:wrap;gap:12px 14px;padding-block:6px}
+.welcome-stamps .stamp{font-size:.8rem}
+.tip{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;padding-top:14px;border-top:1px dashed var(--line);font-size:.92rem;color:var(--muted)}
+
+/* ---------- Dossier en cours ---------- */
+.casebar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:10;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"back title verdict" "timer timer timer";gap:10px 14px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--paper);box-shadow:var(--shadow)}
+.casebar .back{grid-area:back}
+.cb-title{grid-area:title;min-width:0;display:flex;flex-direction:column;line-height:1.15}
+.cb-no{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cb-name{font:700 1.15rem/1.1 var(--f-display);text-transform:uppercase}
+.verdict-btn{grid-area:verdict}
+.timer{grid-area:timer;min-width:0}
+@media (min-width:900px){.casebar{grid-template-columns:auto minmax(0,1fr) minmax(240px,340px) auto;grid-template-areas:"back title timer verdict"}}
+@media (max-width:560px){.cb-name{display:none}}
+@media (max-width:480px){.casebar .back span{display:none}.casebar .back{padding-inline:10px}.verdict-btn{padding-inline:12px}}
+.t-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font:500 .74rem var(--f-mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.t-val{font:700 1rem var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:0;text-transform:none}
+.t-val small{font-size:.75rem;color:var(--muted);font-weight:500}
+.t-over{color:var(--vendeur);font-weight:700}
+.t-mood{margin-left:auto;font:400 .82rem var(--f-body);letter-spacing:0;text-transform:none}
+.segs{display:flex;gap:2px;margin-top:5px}
+.segs i{flex:1;height:7px;border-radius:2px;background:var(--led-off)}
+.segs i.on{background:var(--led);box-shadow:0 0 6px color-mix(in srgb,var(--led) 50%,transparent)}
+.timer.over .segs i.on{background:var(--vendeur);box-shadow:none}
+
+.bench{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"ticket" "mat" "log";gap:16px;margin-top:16px}
+@media (min-width:900px){.bench{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);grid-template-rows:auto 1fr;grid-template-areas:"ticket mat" "log mat";align-items:start}}
+@media (min-width:900px) and (min-height:880px){.mat{position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px)}}
+.ticket{grid-area:ticket;padding:18px 20px}
+.mat{grid-area:mat}
+.log{grid-area:log;padding:18px 20px}
+.ticket-eyebrow{display:flex;justify-content:space-between;gap:12px;font:500 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-bottom:12px;margin-bottom:14px;border-bottom:2px dotted var(--line)}
+.client{display:flex;gap:12px;align-items:center}
+.client-name{font-weight:700;font-size:1.05rem}
+.client-name span{font-weight:400;color:var(--muted)}
+.client-pc{font-size:.92rem}
+.complaint{margin:16px 0 0;padding:14px 16px;border-radius:10px;background:var(--paper-2);font-size:1.08rem;line-height:1.5;font-style:italic}
+.faults-count{margin-top:12px;font:600 .8rem var(--f-mono);color:var(--vendeur);letter-spacing:.04em}
+
+.mat{background-color:var(--mat);color:var(--mat-ink);border-radius:14px;padding:16px;background-image:linear-gradient(var(--mat-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mat-grid) 1px,transparent 1px);background-size:22px 22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:18px}
+.mat-t{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font:800 1.25rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.04em}
+.mat-t span{font:400 .86rem var(--f-body);text-transform:none;letter-spacing:0;color:var(--mat-muted)}
+.grp-h{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-bottom:8px}
+.ico{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--mat-chip);color:var(--led)}
+.grp-name{font:700 1.02rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.05em}
+.grp-hint{font-size:.8rem;color:var(--mat-muted)}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,136px),1fr));gap:8px}
+.tool{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:6px;min-height:64px;padding:10px 12px;border-radius:9px;border:1px solid var(--mat-edge);background:var(--mat-chip);color:var(--mat-ink);text-align:left;font-weight:700;font-size:.9rem;line-height:1.25;cursor:pointer;transition:background-color .15s,transform .1s}
+.tool:hover{background:var(--mat-chip-hover)}
+.tool:active{transform:translateY(1px)}
+.tool-meta{display:inline-flex;align-items:center;gap:4px;font:500 .72rem var(--f-mono);letter-spacing:.04em;color:var(--mat-muted)}
+.tool-meta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.tool.done{background:transparent;border-style:dashed}
+.tool.done .tool-meta{color:var(--led)}
+.tool.done.imp .tool-meta{color:var(--mat-muted)}
+
+.log-t{font:700 1.15rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.empty{color:var(--muted);font-size:.95rem;padding-block:8px}
+.entries{list-style:none;margin:0;padding:0}
+.entry{display:grid;grid-template-columns:3.9rem minmax(0,1fr);gap:4px 12px;padding:14px 0;border-top:1px dashed var(--line)}
+.entry:first-child{border-top:0}
+@media (max-width:560px){.entry{grid-template-columns:minmax(0,1fr);gap:2px}.e-time{line-height:1.4}}
+.e-time{font:500 .78rem/1.9 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.e-main{min-width:0}
+.e-name{font-weight:700;margin-bottom:4px}
+.e-body{font-size:.95rem;display:flex;flex-direction:column;gap:8px}
+.entry.imp .e-body{color:var(--muted)}
+.tag{display:inline-block;font:500 .68rem/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px;border:1px solid var(--line);color:var(--muted);vertical-align:2px}
+.tag.ok{border-color:var(--aucune);color:var(--aucune)}
+.tag.lost{border-color:var(--vendeur);color:var(--vendeur)}
+.alert{margin-top:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--vendeur);background:var(--alert-bg);color:var(--ink);font-size:.92rem}
+
+.dialogue{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;margin:0}
+.dialogue dt{font:500 .72rem/1.9 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dialogue dd{margin:0}
+.dialogue dd.a{font-style:italic}
+.fiche{border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:.92rem;background:var(--paper)}
+.fiche-head{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;background:var(--ink);color:var(--paper);font:600 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase}
+.fiche dl{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr);margin:0}
+.fiche dt,.fiche dd{margin:0;padding:7px 12px;border-bottom:1px solid var(--line)}
+.fiche dt{font:500 .72rem/1.7 var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fiche-notes-t{padding:9px 12px 0;font:500 .72rem var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.fiche ul{margin:0;padding:6px 12px 10px 28px;display:flex;flex-direction:column;gap:4px}
+@media (max-width:440px){.fiche dl{grid-template-columns:minmax(0,1fr)}.fiche dt{border-bottom:0;padding-bottom:0}}
+
+/* ---------- Feuillets ---------- */
+.sheet{border:0;padding:0;background:transparent;color:var(--ink);width:min(640px,calc(100% - 24px));max-width:none;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px)}
+.sheet::backdrop{background:var(--backdrop)}
+.sheet-in{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;gap:14px}
+.sheet-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start}
+.sheet-head h2{grid-column:1;font:800 1.5rem/1.05 var(--f-display);text-transform:uppercase;letter-spacing:.02em;outline:none}
+.sheet-eyebrow{grid-column:1;font:500 .72rem var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sheet-sub{grid-column:1;color:var(--muted);font-size:.92rem}
+.x{grid-column:2;grid-row:1 / span 2;display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer}
+.sheet-body{font-size:1rem;display:flex;flex-direction:column;gap:10px}
+.how{border-top:1px dashed var(--line);padding-top:10px}
+.how summary{cursor:pointer;font-weight:700;font-size:.92rem}
+.how p{margin-top:8px;font-size:.93rem;color:var(--muted)}
+.sheet-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:2px}
+@media (max-width:640px){.sheet{width:100%;margin:auto 0 0;max-height:92vh;max-height:92dvh}.sheet-in{border-radius:16px 16px 0 0;max-height:92vh;max-height:92dvh;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px))}}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--paper);text-align:left;cursor:pointer}
+.choice:hover{border-color:var(--c)}
+.choice.sel{--gap:var(--paper-2);--gap:color-mix(in srgb,var(--c) 9%,var(--paper));border:2px solid var(--c);background:var(--gap)}
+.choice .stamp{--r:-2deg;font-size:.95rem}
+.choice-desc{font-size:.93rem;color:var(--muted)}
+.choice.sel .choice-desc{color:var(--ink)}
+.ev-list{display:flex;flex-direction:column;gap:8px}
+.ev{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.ev:has(input:checked){border-color:var(--ink);background:var(--paper-2)}
+.ev input{margin-top:3px;accent-color:var(--ink);width:18px;height:18px;flex:none}
+.ev b{display:block}
+.ev small{display:block;color:var(--muted);font-size:.86rem;line-height:1.4}
+.ps-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ps-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px dashed var(--line)}
+.ps-row:first-child{border-top:0}
+.ps-main{flex:1;min-width:0}
+
+/* ---------- Bilan ---------- */
+.dbf-top{display:grid;grid-template-columns:minmax(0,1.3fr) auto minmax(0,1fr);gap:20px 28px;align-items:center;padding:22px 24px}
+@media (max-width:860px){.dbf-top{grid-template-columns:minmax(0,1fr) auto}.dbf-stamp{grid-column:1 / -1}}
+.dbf-top h1{font:800 clamp(1.7rem,4.4vw,2.6rem)/1 var(--f-display);text-transform:uppercase;margin-block:6px;outline:none}
+.dbf-score{display:flex;flex-direction:column;align-items:flex-end;text-align:right}
+.score-n{font:800 clamp(3rem,9vw,4.6rem)/.9 var(--f-display);font-variant-numeric:tabular-nums}
+.score-d{font:500 .9rem var(--f-mono);color:var(--muted)}
+.score-w{font-weight:700;font-size:.92rem;margin-top:4px}
+.dbf-stamp{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding-block:6px}
+.mine{font-size:.9rem;color:var(--muted)}
+.dbf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+@media (max-width:860px){.dbf-grid{grid-template-columns:minmax(0,1fr)}}
+.span2{grid-column:1 / -1}
+.dbf-grid h2{font:700 1.15rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px}
+.score-t{width:100%;border-collapse:collapse;font-size:.93rem}
+.score-t td{padding:8px 0;border-bottom:1px dashed var(--line);vertical-align:top}
+.score-t td:last-child{text-align:right;font:600 .95rem var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:12px}
+.score-t small{display:block;color:var(--muted);font-size:.82rem}
+.score-t tr.total td{border-bottom:0;font-weight:700;padding-top:10px}
+.keys{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.key-item{padding:12px 14px;border-radius:10px;background:var(--paper-2);display:flex;flex-direction:column;gap:6px;font-size:.93rem;min-width:0}
+.key-name{font-weight:700;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.key-item ul{margin:0;padding-left:18px}
+.keys-note{margin-top:10px;font-size:.88rem;color:var(--muted)}
+.errs{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.95rem}
+.say{margin:0;padding:14px 16px;border-radius:10px;background:var(--paper-2);font-size:1.02rem;line-height:1.55}
+.lesson{background-color:var(--mat);color:var(--mat-ink);border-radius:14px;padding:20px 24px;background-image:linear-gradient(var(--mat-grid) 1px,transparent 1px),linear-gradient(90deg,var(--mat-grid) 1px,transparent 1px);background-size:22px 22px}
+.lesson-k{font:500 .74rem var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--led)}
+.lesson-t{font:700 clamp(1.3rem,3.2vw,1.8rem)/1.15 var(--f-display);text-transform:uppercase;letter-spacing:.02em;margin-top:6px;text-wrap:balance}
+.dbf-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+
+/* ---------- Méthode, fiche, équipe ---------- */
+.doc{max-width:880px;margin-inline:auto;display:flex;flex-direction:column;gap:34px;padding-top:12px}
+.doc-head h1{font:800 clamp(2rem,5vw,3rem)/1 var(--f-display);text-transform:uppercase;margin-block:8px 12px}
+.doc section > h2{font:700 1.35rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em;margin-bottom:14px}
+.vcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+.vcard{padding:18px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.vcard p{font-size:.95rem}
+.vcard .then{font-weight:700}
+.callout{margin-top:14px;padding:16px 18px;border-radius:12px;border:1.5px solid var(--ink);font-size:1rem}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2.6rem minmax(0,1fr);gap:2px 14px;padding:14px 0;border-top:1px dashed var(--line)}
+.steps li::before{content:counter(s);grid-row:span 2;font:800 2rem/1 var(--f-display);color:var(--led)}
+.steps b{font:700 1.12rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.signs{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.signs li{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) 8.5rem;gap:6px 16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.signs li.s-head{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:8px}
+.s-mean{color:var(--muted)}
+@media (max-width:640px){.signs li{grid-template-columns:minmax(0,1fr)}.signs li.s-head{display:none}}
+.who{justify-self:start;font:700 .8rem/1 var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--c);border:1.5px solid var(--c);border-radius:4px;padding:5px 7px;white-space:nowrap}
+.how-g + .how-g{margin-top:18px}
+.how-g h3{font:700 1rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:10px}
+.howto > div{padding:14px 16px;border-radius:10px;background:var(--paper);border:1px solid var(--line)}
+.howto b{display:block;margin-bottom:4px}
+.howto p{font-size:.92rem;color:var(--muted)}
+.lex{display:grid;grid-template-columns:minmax(0,11rem) minmax(0,1fr);margin:0}
+.lex dt,.lex dd{margin:0;padding:10px 0;border-bottom:1px dashed var(--line)}
+.lex dt{font-weight:700;padding-right:12px}
+@media (max-width:560px){.lex{grid-template-columns:minmax(0,1fr)}.lex dt{border-bottom:0;padding-bottom:0}}
+.checklist h3{font:700 1rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:18px 0 6px}
+.chk-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.chk-head h2,.card-t{font:700 1.35rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.03em}
+.chk-count{font:600 1rem var(--f-mono);font-variant-numeric:tabular-nums}
+.chk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.chk-list label{display:flex;gap:12px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer}
+.chk-list label:hover{background:var(--paper-2)}
+.chk-list input{width:20px;height:20px;margin-top:2px;accent-color:var(--aucune);flex:none}
+.chk-list input:checked + span{color:var(--muted);text-decoration:line-through;text-decoration-thickness:1px}
+.chk-foot{margin-top:14px}
+.wa h2{margin-bottom:8px}
+.wa-msg{white-space:pre-wrap;overflow-wrap:anywhere;padding:16px 18px;border-radius:14px 14px 14px 4px;background:var(--paper-2);border:1px solid var(--line);font-size:.98rem;line-height:1.55;margin-block:14px}
+.row-btns{display:flex;flex-wrap:wrap;gap:10px}
+.team{list-style:none;margin:14px 0 0;padding:0}
+.pl-row{display:grid;grid-template-columns:1.7rem auto minmax(0,1fr) auto;grid-template-areas:"pos av main score" ". . actions actions";gap:8px 12px;align-items:center;padding:14px 0;border-top:1px dashed var(--line)}
+.pl-row:first-child{border-top:0}
+.pl-pos{grid-area:pos;font:800 1.35rem/1 var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums}
+.pl-row > .avatar{grid-area:av}
+.pl-main{grid-area:main;min-width:0}
+.pl-name{font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:6px;overflow-wrap:anywhere}
+.pl-sub{font-size:.86rem;color:var(--muted)}
+.pl-score{grid-area:score;text-align:right;font:800 1.7rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.pl-score small{display:block;font:500 .68rem var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.pl-actions{grid-area:actions;display:flex;flex-wrap:wrap;gap:8px}
+.leds{display:flex;flex-wrap:wrap;gap:2px;margin-top:7px}
+.leds i{width:9px;height:9px;border-radius:2px;background:var(--led-off)}
+.leds i.hi{background:var(--aucune)}
+.leds i.mid{background:var(--led)}
+.leds i.lo{background:var(--vendeur)}
+.led-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:12px;font-size:.82rem;color:var(--muted)}
+.led-key span{display:inline-flex;align-items:center;gap:6px}
+.led-key i{width:10px;height:10px;border-radius:3px;background:var(--led-off)}
+.led-key i.hi{background:var(--aucune)}
+.led-key i.mid{background:var(--led)}
+.led-key i.lo{background:var(--vendeur)}
+.add-form{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:8px}
+.install-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin-block:12px}
+.install-grid > div{padding:14px 16px;border-radius:10px;background:var(--paper-2)}
+.install-grid h3{font:700 1.05rem/1.2 var(--f-display);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.install-grid ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:.95rem}
+.note{font-size:.88rem;color:var(--muted);margin-top:10px}
+.gap-t{margin-top:10px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <span class="brand-eyebrow">NouR’s Market · Formation SAV</span>
+      <span class="wordmark">Comptoir SAV</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" id="tab-jouer" data-tab="jouer" aria-controls="app" aria-selected="true">Jouer</button>
+      <button type="button" role="tab" id="tab-methode" data-tab="methode" aria-controls="app" aria-selected="false">La méthode</button>
+      <button type="button" role="tab" id="tab-fiche" data-tab="fiche" aria-controls="app" aria-selected="false">Fiche de livraison</button>
+      <button type="button" role="tab" id="tab-equipe" data-tab="equipe" aria-controls="app" aria-selected="false">Équipe</button>
+    </nav>
+    <div id="player-slot" class="player-slot"></div>
+  </div>
+</header>
+<main id="app" class="wrap"></main>
+<nav class="bottomnav" aria-label="Navigation">
+  <button type="button" data-tab="jouer"><span class="bn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>Jouer</button>
+  <button type="button" data-tab="methode"><span class="bn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h10.5a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10.5"/></svg></span>Méthode</button>
+  <button type="button" data-tab="fiche"><span class="bn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 14h7M8.5 18h4"/></svg></span>Fiche</button>
+  <button type="button" data-tab="equipe"><span class="bn-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.6 14.4a4.5 4.5 0 0 1 5.4 4.6"/></svg></span>Équipe</button>
+</nav>
+<dialog id="sheet" class="sheet" aria-labelledby="sheet-title"><div class="sheet-in" id="sheet-in"></div></dialog>
+
+<script>
+(function () {
+'use strict';
+
+/* ================= Texte ================= */
+const NB = ' ';
+const fr = s => String(s).replace(/ ([?!:;»%])/g, NB + '$1').replace(/« /g, '«' + NB);
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const strip = s => String(s).replace(/<[^>]+>/g, '');
+const pad2 = n => String(n).padStart(2, '0');
+
+const BUDGET = 45;
+const LEVELS = {1:'Facile', 2:'Moyen', 3:'Difficile'};
+
+/* ================= Verdicts ================= */
+const VERDICTS = {
+  VENDEUR:{stamp:'Prise en charge vendeur', label:'Vendeur', cls:'c-vendeur',
+    short:'Le défaut vient de la machine.',
+    desc:'Le défaut vient de la machine : il existait déjà à la livraison, même caché, ou il apparaît peu après sans aucune cause extérieure.',
+    then:'On répare, on échange ou on rembourse, à nos frais.'},
+  CLIENT:{stamp:'À la charge du client', label:'Client', cls:'c-client',
+    short:'Le problème vient de ce qui s’est passé après la livraison.',
+    desc:'Le problème vient de ce qui s’est passé après la livraison (choc, liquide, chargeur, surtension, logiciels, ouverture par un tiers) ou de l’usure après une longue utilisation.',
+    then:'Réparation sur devis. Un geste commercial reste possible.'},
+  AUCUNE:{stamp:'Aucune panne', label:'Aucune panne', cls:'c-aucune',
+    short:'Rien n’est cassé : un réglage, une fausse manip, l’usure normale.',
+    desc:'Rien n’est cassé : un réglage, une mauvaise manipulation ou l’usure normale.',
+    then:'On corrige gratuitement, devant le client, et on lui explique.'}
+};
+const VORDER = ['VENDEUR', 'CLIENT', 'AUCUNE'];
+
+/* ================= Outils ================= */
+const GROUPS = [
+  {id:'enquete', name:'Enquête', hint:'Écouter et vérifier les papiers', icon:'talk'},
+  {id:'inspect', name:'Inspection', hint:'PC éteint, avant de brancher', icon:'lens'},
+  {id:'hard', name:'Tests matériels', hint:'Alimentation, écran, diagnostic, intérieur', icon:'plug'},
+  {id:'win', name:'Tests sous Windows', hint:'Seulement si le PC démarre et affiche', icon:'win'}
+];
+const ACTIONS = [
+  {id:'question', g:'enquete', name:'Interroger le client', min:3,
+    how:'Laisse le client tout raconter sans l’interrompre. Puis pose des questions ouvertes : depuis quand ? que s’est-il passé juste avant ? qui d’autre a utilisé le PC ? quel chargeur ? Note ses mots exacts.'},
+  {id:'fiche', g:'enquete', name:'Lire la fiche de livraison', min:1,
+    how:'Retrouve la fiche grâce au numéro de série (cahier, photos, message WhatsApp de livraison) : date de livraison, état et tests notés ce jour-là.'},
+  {id:'visual', g:'inspect', name:'Inspecter coque et écran', min:2,
+    how:'PC éteint, sous une bonne lumière : les 4 coins, le capot, les charnières, l’écran (fissure, point d’impact), le dessous. Photographie tout devant le client.'},
+  {id:'seal', g:'inspect', name:'Contrôler scellé et vis', min:1,
+    how:'Vérifie que le scellé est intact et que les têtes de vis ne sont ni abîmées ni manquantes. Photographie avant toute ouverture.'},
+  {id:'liquid', g:'inspect', name:'Chercher des traces de liquide', min:2,
+    how:'Appuie sur les touches (collantes ?), cherche les auréoles, les traces sucrées, une odeur, de la rouille sur les ports et les vis. Toujours avant d’allumer.'},
+  {id:'charger', g:'inspect', name:'Examiner le chargeur du client', min:1,
+    how:'Demande le chargeur que le client utilise vraiment. Lis l’étiquette (marque, watts) et compare avec le chargeur d’origine. Regarde l’embout : noirci, tordu ?'},
+  {id:'power', g:'hard', name:'Allumer avec notre chargeur', min:2, power:true,
+    how:'Branche notre chargeur d’origine, que tu sais bon. Observe les voyants, le ventilateur, les bips et l’image. Si rien ne se passe : chargeur débranché, maintiens le bouton d’alimentation 30 secondes, puis réessaie.'},
+  {id:'external', g:'hard', name:'Brancher un écran externe', min:3, power:true,
+    how:'Câble HDMI vers une télé ou un écran. Si rien ne s’affiche, appuie plusieurs fois sur Windows + P pour changer de mode d’affichage.'},
+  {id:'diag', g:'hard', name:'Diagnostic du fabricant', min:12, power:true,
+    how:'Au démarrage, HP : Échap puis F2. Dell : F12 puis « Diagnostics ». Lenovo : Entrée puis F10 (selon les modèles). Lance le test complet et note les codes d’erreur.'},
+  {id:'open', g:'hard', name:'Ouvrir le capot', min:10,
+    how:'Seulement après avoir contrôlé et photographié le scellé. Chargeur débranché, débranche la batterie interne avant de toucher quoi que ce soit. Cherche la corrosion, les brûlures, les pièces différentes de la fiche, la poussière.'},
+  {id:'settings', g:'win', name:'Vérifier les réglages', min:3, power:true, win:true,
+    how:'Regarde l’icône Wi-Fi et le mode Avion, le volume et la sortie du son, la luminosité, Paramètres > Pavé tactile, les options de batterie du fabricant. Clic droit sur Démarrer > Gestionnaire de périphériques : aucun point d’exclamation jaune.'},
+  {id:'peripherals', g:'win', name:'Tester clavier, pavé, ports', min:4, power:true, win:true,
+    how:'Teste chaque touche sur un site de test de clavier (cherche « keyboard test »), le pavé tactile, chaque port USB avec une clé, le son, la webcam (application Caméra). Compare avec un clavier ou une souris USB.'},
+  {id:'battery', g:'win', name:'Rapport de batterie', min:3, power:true, win:true,
+    how:'Clic droit sur Démarrer > Terminal (ou PowerShell), tape : powercfg /batteryreport. Ouvre le fichier indiqué. Compare la capacité d’origine (Design capacity) et la capacité actuelle (Full charge capacity), puis regarde le nombre de cycles et l’historique.'},
+  {id:'disk', g:'win', name:'Santé du disque', min:3, power:true, win:true,
+    how:'Installe CrystalDiskInfo (gratuit) : état (Bon, Prudence, Mauvais), heures de fonctionnement, secteurs réalloués. Regarde aussi l’espace libre dans l’Explorateur.'},
+  {id:'temp', g:'win', name:'Température et ventilateur', min:5, power:true, win:true,
+    how:'Installe HWMonitor ou HWiNFO (gratuits) et fais travailler le PC : regarde la température du processeur. Vers 95 à 100 °C, le PC peut s’éteindre pour se protéger. Écoute et sens le souffle à la grille.'},
+  {id:'reliability', g:'win', name:'Historique de fiabilité', min:4, power:true, win:true,
+    how:'Touche Windows, tape « fiabilité », ouvre « Afficher l’historique de fiabilité ». Les croix rouges montrent, jour par jour, les plantages et les arrêts inattendus, et ce qui a été installé.'},
+  {id:'antivirus', g:'win', name:'Analyse antivirus', min:10, power:true, win:true,
+    how:'Sécurité Windows > Protection contre les virus et menaces > Options d’analyse > Analyse complète. Puis Ctrl + Maj + Échap pour voir les applications de démarrage, et Paramètres > Applications pour voir ce qui a été installé.'}
+];
+const ACT = {};
+ACTIONS.forEach(a => { ACT[a.id] = a; });
+
+const DEF = {
+  visual:'Coque, coins et charnières en bon état. Écran sans fissure ni rayure. Aucune trace de choc.',
+  seal:'Scellé intact, vis d’origine non abîmées : le PC n’a pas été ouvert depuis la livraison.',
+  liquid:'Aucune trace de liquide : touches souples, pas d’auréole, pas d’odeur, ports et vis propres.',
+  charger:'Le client utilise le chargeur d’origine remis à la livraison. Câble et embout en bon état.',
+  power:'Le PC démarre normalement jusqu’à Windows.',
+  external:'L’image s’affiche normalement sur l’écran externe, comme sur l’écran du PC.',
+  diag:'Tous les tests sont RÉUSSIS : processeur, mémoire, disque, batterie, ventilateur, écran.',
+  open:'Intérieur propre : pas de corrosion, pas de poussière anormale, aucun composant brûlé, connecteurs bien en place.',
+  settings:'Réglages normaux : Wi-Fi activé, mode Avion désactivé, son activé, luminosité correcte. Aucun point d’exclamation dans le Gestionnaire de périphériques.',
+  peripherals:'Toutes les touches répondent. Pavé tactile, ports USB, son et webcam fonctionnent.',
+  battery: c => 'Capacité actuelle : ' + c.batNow + ' % de la capacité d’origine. Batterie en bonne santé.',
+  disk:'Disque en bonne santé (état « Bon »), aucune erreur, espace libre suffisant.',
+  temp:'Processeur entre 45 et 65 °C en usage normal. Le ventilateur tourne et accélère quand le PC travaille. Rien d’anormal.',
+  reliability:'Aucune erreur matérielle, pas d’arrêt inattendu récent.',
+  antivirus:'Aucune menace détectée. Programmes installés normaux, démarrage rapide.'
+};
+const NOPOWER = {
+  external:'Aucune image sur l’écran externe : le PC ne s’allume pas du tout.',
+  diag:'Impossible : le PC ne s’allume pas, le diagnostic ne peut pas se lancer.',
+  win:'Impossible : le PC ne s’allume pas, Windows ne peut pas démarrer.'
+};
+const BLACK_HINT = 'Tu ne vois rien : l’écran du PC reste noir. Trouve d’abord un moyen d’afficher l’image, puis reviens à ce test.';
+const SEAL_LATE = 'Trop tard : tu as ouvert le PC toi-même avant de contrôler le scellé. Impossible de prouver dans quel état il était.';
+const FAULTS = {
+  wet:'Faute grave : tu as mis sous tension un PC qui avait pris du liquide. Le courant peut aggraver le court-circuit et détruire la carte mère. Cherche toujours les traces de liquide avant de brancher.',
+  seal:'Faute grave : tu as ouvert le PC avant de contrôler le scellé. Tu ne peux plus prouver qu’il n’avait pas été ouvert par quelqu’un d’autre. Contrôle et photographie le scellé avant d’ouvrir.'
+};
+
+/* ================= Dossiers ================= */
+const CASES = [
+{ id:1, level:1, title:'Plus de Wi-Fi', client:'Aroun', role:'étudiant en BTS',
+  model:'Lenovo ThinkPad T480', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'PF-1KQ7M2',
+  soldDays:20, boot:'ok', batNow:86,
+  complaint:'Depuis hier, impossible de me connecter au Wi-Fi. Même la liste des réseaux a disparu. Je crois que la carte Wi-Fi est gâtée.',
+  fiche:['Wi-Fi, son, webcam et clavier testés devant le client : OK','Batterie : 87 % de santé','Coque et écran : très bon état, 4 photos envoyées sur WhatsApp','Scellé n° NM-0312 posé sur une vis du dessous'],
+  r:{
+    question:[['Il s’est passé quelque chose de spécial hier ?','Non… J’ai juste voulu baisser le son. J’ai appuyé sur plusieurs touches en haut du clavier, et après, plus d’Internet.'],['Le PC est tombé, ou il a pris de l’eau ?','Non, jamais.']],
+    settings:'Le <b>mode Avion est activé</b> : petite icône d’avion à côté de l’horloge. Sur ce modèle, une touche du haut du clavier (symbole d’avion) l’active et le désactive. Après désactivation, la liste des réseaux revient et la connexion fonctionne.',
+    diag:'Tous les tests sont RÉUSSIS, carte Wi-Fi comprise.'
+  },
+  answer:'AUCUNE', key:['settings'],
+  story:'Rien n’est cassé. En voulant baisser le son, le client a appuyé sur la touche qui active le mode Avion : Windows a coupé le Wi-Fi. On règle gratuitement devant lui et on lui montre la touche.',
+  say:'Bonne nouvelle : votre ordinateur n’a aucun problème. Le mode Avion s’est activé avec cette touche, regardez. Je l’enlève… voilà, le Wi-Fi revient. Si ça recommence, appuyez simplement dessus.',
+  lesson:'Vérifie toujours les réglages simples avant de soupçonner une panne.' },
+
+{ id:2, level:1, title:'Écran cassé « tout seul »', client:'M. Koffi', role:'commercial',
+  model:'Dell Latitude 7490', config:'Core i7 (8e gén.) · 16 Go · SSD 512 Go', serial:'Service Tag 4XK8L72',
+  soldDays:45, boot:'ok', batNow:84,
+  complaint:'J’ai sorti mon PC du sac ce matin, l’écran était cassé. Je n’ai rien fait ! Vos ordinateurs ne sont pas solides.',
+  fiche:['Écran : impeccable, aucun pixel mort. Photo de l’écran allumé sur fond blanc envoyée au client sur WhatsApp','Coque : très bon état, 4 photos','Batterie : 85 % de santé','Scellé n° NM-0298 posé'],
+  r:{
+    question:[['Qu’est-ce qu’il y avait dans le sac avec le PC ?','Mes dossiers, mon chargeur, mes clés… le normal.'],['Le sac est tombé, ou quelqu’un s’est assis dessus ?','Euh… je l’ai posé sur le siège de la voiture. Mon collègue est monté, je ne sais pas s’il s’est assis dessus.']],
+    visual:'Fissure en forme d’étoile qui part d’<b>un point précis</b>, en bas à droite de l’écran. Au même endroit, le capot extérieur porte une petite bosse ronde, comme si un objet dur avait été pressé fort contre lui (clé, embout de chargeur).',
+    power:'Le PC démarre jusqu’à Windows. L’image est visible, mais avec une grosse tache noire et des traînées de couleur autour du point de fissure.',
+    external:'Image parfaite sur l’écran externe : la carte mère et la carte graphique vont bien. Seule la dalle, l’écran du PC, est abîmée.',
+    diag:'Tous les tests sont RÉUSSIS. Le test de l’écran montre des zones mortes autour de la fissure.'
+  },
+  answer:'CLIENT', key:['visual','fiche'],
+  story:'Une dalle ne se fissure pas toute seule. La fissure en étoile part d’un point d’impact, et le capot porte une marque au même endroit : c’est une pression ou un choc (objet dur dans le sac, quelqu’un assis dessus). La photo envoyée le jour de la livraison prouve que l’écran était parfait. Le remplacement de la dalle est à la charge du client.',
+  say:'Regardez ici : la fissure part de ce point précis, et il y a une petite bosse au même endroit derrière l’écran. C’est la trace d’une pression, souvent une clé ou le chargeur dans le sac. Sur la photo du jour de la livraison, l’écran était parfait. Ce n’est donc pas un défaut de l’ordinateur. Je vous fais un devis pour changer l’écran, et je vous conseille une housse rigide.',
+  lesson:'Une fissure part toujours d’un point d’impact : cherche-le.' },
+
+{ id:3, level:1, title:'La touche E capricieuse', client:'Grâce', role:'secrétaire',
+  model:'HP ProBook 450 G7', config:'Core i5 (10e gén.) · 8 Go · SSD 256 Go', serial:'5CD0274KQX',
+  soldDays:12, boot:'ok', batNow:90,
+  complaint:'La touche E marche une fois sur deux, presque depuis l’achat. Pour taper mes courriers, c’est l’enfer.',
+  fiche:['Clavier : case « testé touche par touche » <b>non cochée</b>','Écran et coque : très bon état','Batterie : 91 % de santé','Scellé n° NM-0350 posé'],
+  r:{
+    question:[['Quelque chose a été renversé sur le clavier ?','Non, je ne mange jamais devant l’ordinateur.'],['Ça a commencé quand ?','Deux ou trois jours après la livraison. Au début, je pensais que j’appuyais mal.']],
+    visual:'Coque en très bon état. Clavier propre : aucune touche arrachée, enfoncée ou décolorée.',
+    peripherals:'Test touche par touche : la touche <b>E ne répond que 3 fois sur 10</b>. Toutes les autres touches répondent. Avec un clavier USB externe, la lettre E s’écrit parfaitement : le problème vient du clavier du PC, pas de Windows.',
+    diag:'Test interactif du clavier : la touche E n’est détectée qu’une fois sur trois. Tous les autres tests sont RÉUSSIS.'
+  },
+  answer:'VENDEUR', key:['peripherals','diag'],
+  story:'La touche est défectueuse depuis les premiers jours, sans liquide ni choc. La fiche montre même que le clavier n’a pas été testé touche par touche avant la livraison. C’est un défaut de la machine : on change le clavier à nos frais.',
+  say:'Merci d’être revenue. Le test confirme que la touche E est défectueuse, et il n’y a aucune trace de choc ni de liquide. C’est pour nous : on change le clavier, et je vous prête un clavier USB en attendant.',
+  lesson:'Défaut sans cause extérieure, juste après la livraison : on prend en charge. Et on teste chaque touche avant de livrer.' },
+
+{ id:4, level:1, title:'Bloquée à 80 %', client:'Fatou', role:'consultante',
+  model:'Lenovo ThinkPad T490', config:'Core i5 (8e gén.) · 16 Go · SSD 512 Go', serial:'PF-2A9X4R',
+  soldDays:30, boot:'ok', batNow:93,
+  complaint:'Ma batterie ne charge jamais au-dessus de 80 %. Elle est sûrement gâtée, je veux qu’on la change.',
+  fiche:['Batterie : 94 % de santé, 170 cycles','Tous les tests : OK','Préparation atelier : mises à jour Lenovo Vantage installées','Scellé n° NM-0331 posé'],
+  r:{
+    question:[['Depuis quand ?','Depuis le début, je crois. Je n’avais pas fait attention.'],['Il s’éteint brusquement ? Il tient combien de temps ?','Non, il ne s’éteint jamais. Il tient environ 5 heures.']],
+    battery:'Capacité actuelle : <b>93 %</b> de la capacité d’origine, 182 cycles. Batterie en très bonne santé.',
+    settings:'Dans Lenovo Vantage, rubrique Alimentation : le <b>seuil de charge de la batterie est activé</b>, avec arrêt de la charge à 80 %. Cette option protège la batterie quand le PC reste souvent branché. Si on la désactive, la batterie charge jusqu’à 100 %.',
+    diag:'Tous les tests sont RÉUSSIS, batterie comprise (état : bon).'
+  },
+  answer:'AUCUNE', key:['settings','battery'],
+  story:'Aucune panne. Un seuil de charge à 80 % est activé pour ménager la batterie : c’est une fonction des ThinkPad. La batterie est en excellente santé (93 %). On explique et on laisse le choix à la cliente.',
+  say:'Votre batterie est en très bonne santé : 93 %. Elle s’arrête à 80 % à cause d’une option qui la protège. Je peux la désactiver pour charger à 100 %. Mais si votre ordinateur reste souvent branché, gardez 80 % : la batterie durera plus longtemps.',
+  lesson:'Avant de changer une pièce, vérifie que ce n’est pas une option du fabricant.' },
+
+{ id:5, level:2, title:'Il ne s’allume plus', client:'Mme Bamba', role:'gestionnaire',
+  model:'HP EliteBook 840 G5', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'5CG8312ZTN',
+  soldDays:35, boot:'none', liquidDanger:true, batNow:86,
+  complaint:'Hier soir, je l’ai fermé normalement. Ce matin, il ne s’allume plus du tout. Je n’ai rien fait de spécial.',
+  fiche:['Clavier, écran et ports : testés OK devant la cliente','Batterie : 87 % de santé','Coque : bon état, 4 photos','Scellé n° NM-0287 posé'],
+  r:{
+    question:[['Où était le PC hier soir ?','Sur la table du salon, comme d’habitude.'],['Quelqu’un a pu renverser quelque chose dessus ?','Non… Les enfants jouaient à côté avec leurs jus, mais ils n’ont pas touché l’ordinateur.']],
+    liquid:'Plusieurs touches <b>collent</b> (F, G, H, J). Traces sucrées séchées entre les touches, légère odeur de jus de fruit. Auréole blanchâtre sur le repose-poignet droit.',
+    visual:'Coque sans trace de choc. On remarque une légère auréole sur le repose-poignet droit.',
+    power:'Aucune réaction : pas de voyant, pas de ventilateur, rien.',
+    open:'Sous le clavier : <b>corrosion verte et blanche</b> sur la carte mère, autour du connecteur du clavier et de plusieurs petits composants. Traces de liquide séché.'
+  },
+  answer:'CLIENT', key:['liquid','open'],
+  story:'La cliente dit qu’elle n’a rien fait, et elle est peut-être sincère : ce sont sûrement les enfants. Mais les preuves sont claires : touches collantes, traces sucrées, corrosion sur la carte mère. Du liquide a été renversé et a provoqué un court-circuit. La réparation est à la charge de la cliente.',
+  say:'Madame, je vous montre : sous le clavier, il y a du jus séché et de l’oxydation sur la carte mère. Ce n’est pas un défaut de l’ordinateur, c’est un liquide renversé, peut-être sans que vous l’ayez vu. Je vous propose un nettoyage de la carte, puis un devis si une pièce doit être changée.',
+  lesson:'N’allume jamais un PC qui a pu prendre l’eau. Et vérifie ce que dit le client, sans l’accuser.' },
+
+{ id:6, level:2, title:'La batterie ne tient plus', client:'Yao', role:'comptable',
+  model:'HP EliteBook 840 G6', config:'Core i5 (8e gén.) · 16 Go · SSD 512 Go', serial:'5CG9418WQP',
+  soldDays:21, boot:'ok', batNow:40,
+  complaint:'Le jour de l’achat, on m’a dit que la batterie tient 4 heures. Là, elle tient à peine 40 minutes.',
+  fiche:['Batterie : « bonne », <b>santé non mesurée</b> (case vide)','Clavier, écran et ports : testés OK','Scellé n° NM-0344 posé'],
+  r:{
+    question:[['Comment l’utilisez-vous ?','Excel, Internet, un peu de vidéos le soir. Rien de lourd.'],['Vous l’avez laissé au soleil, ou dans une voiture chaude ?','Non, il reste à la maison ou au bureau.']],
+    battery:'Capacité d’origine 50 000 mWh, capacité actuelle <b>19 900 mWh, soit 40 %</b>. 917 cycles. L’historique du rapport montre que la capacité était <b>déjà à 41 %</b> trois semaines avant la date de livraison.',
+    diag:'Test de la batterie : « REMPLACER » (capacité très faible). Tous les autres tests sont RÉUSSIS.',
+    settings:'Luminosité à 60 %, mode d’alimentation « Équilibré », aucun programme gourmand. Réglages normaux.'
+  },
+  answer:'VENDEUR', key:['battery','diag'],
+  story:'La batterie était déjà usée avant la livraison : 40 % de capacité, plus de 900 cycles, et l’historique le prouve. La fiche montre que sa santé n’avait pas été mesurée : la boutique a livré une batterie faible en la présentant comme bonne. C’est un défaut caché : on remplace la batterie à nos frais.',
+  say:'Vous avez raison, et je m’excuse : le test montre que la batterie était déjà faible quand nous vous avons livré l’ordinateur. On la remplace à nos frais.',
+  lesson:'Mesure toujours la batterie avant de livrer, et écris le pourcentage sur la fiche.' },
+
+{ id:7, level:2, title:'Lent et plein de pubs', client:'Ibrahim', role:'étudiant',
+  model:'Dell Latitude 5490', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'Service Tag 9JD2M53',
+  soldDays:60, boot:'ok', batNow:84,
+  complaint:'Au début il était rapide. Maintenant il met 5 minutes à démarrer, tout rame, et des publicités s’ouvrent toutes seules.',
+  fiche:['Windows réinstallé propre avant la livraison, démarrage en 25 secondes','SSD : état Bon (98 %), 42 Go utilisés','Batterie : 85 % de santé','Scellé n° NM-0263 posé'],
+  r:{
+    question:[['Qu’avez-vous installé depuis l’achat ?','Office, des jeux, un logiciel de montage… Un ami me les a passés sur une clé USB.'],['C’étaient des versions payantes ?','Non, des versions « crackées ». Tout le monde fait ça !']],
+    power:'Le PC démarre, mais il met près de 5 minutes à afficher le bureau. Deux fenêtres de publicité s’ouvrent toutes seules.',
+    antivirus:'Windows Defender détecte <b>14 menaces</b> (chevaux de Troie et logiciels publicitaires) venant de « Office_Activator.exe » et « Jeu_Setup_crack.exe ». 31 programmes se lancent au démarrage, dont 3 « optimiseurs » inconnus.',
+    disk:'SSD en bonne santé (97 %). Mais il ne reste que <b>2,8 Go libres sur 237 Go</b> : le disque est presque plein.',
+    temp:'Processeur à 85 °C alors qu’aucun programme n’est ouvert : des programmes cachés le font travailler en permanence.',
+    reliability:'Des dizaines d’installations de programmes ces dernières semaines. Aucune panne matérielle signalée.'
+  },
+  answer:'CLIENT', key:['antivirus','disk'],
+  story:'Le matériel est en parfait état : diagnostic réussi, SSD sain. La lenteur vient des logiciels piratés installés par le client : virus, publicités, programmes au démarrage et disque plein. Ce n’est pas un défaut de la machine. On propose un nettoyage payant, ou offert en geste commercial, et on donne des conseils.',
+  say:'Votre ordinateur est en bonne santé, le test du matériel est parfait. Le problème vient des logiciels crackés de la clé USB : ils ont installé des virus et des publicités. Je peux faire un nettoyage complet : sauvegarde de vos fichiers, puis réinstallation propre. C’est un service payant, mais je vous fais un bon prix. Et évitez les logiciels crackés : c’est la première cause de virus.',
+  lesson:'PC lent ne veut pas dire PC en panne : teste le matériel, puis regarde les logiciels.' },
+
+{ id:8, level:2, title:'Le pavé tactile ne répond plus', client:'Mme Kouamé', role:'enseignante',
+  model:'HP EliteBook 830 G6', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'5CG9367HFL',
+  soldDays:18, boot:'ok', batNow:88,
+  complaint:'Le pavé tactile ne marche plus du tout, le curseur ne bouge pas. Je suis obligée de tout faire au clavier.',
+  fiche:['Pavé tactile, clavier et ports : testés OK devant la cliente','Batterie : 89 % de santé','Scellé n° NM-0358 posé'],
+  r:{
+    question:[['Quelqu’un d’autre a utilisé l’ordinateur ?','Mon fils, ce week-end, pour jouer. Il a branché sa souris.'],['Le PC est tombé, ou il a pris de l’eau ?','Non.']],
+    visual:'Coque et pavé tactile en bon état. Un petit récepteur USB de souris sans fil est encore branché sur le côté gauche.',
+    peripherals:'Pavé tactile : le curseur ne bouge pas. Une souris USB fonctionne, le clavier et les ports aussi. Le récepteur d’une souris sans fil est branché dans un port USB.',
+    settings:'Paramètres, rubrique Pavé tactile : l’option « Laisser le pavé tactile activé lorsqu’une souris est connectée » est <b>décochée</b>. Comme le récepteur de la souris du fils est resté branché, Windows coupe le pavé tactile. On coche l’option : le pavé tactile remarche aussitôt.',
+    diag:'Tous les tests sont RÉUSSIS, pavé tactile compris.'
+  },
+  answer:'AUCUNE', key:['settings'],
+  story:'Rien n’est cassé. Windows désactive le pavé tactile quand une souris est branchée, et le récepteur de la souris du fils était resté dans le port USB. On change le réglage devant la cliente.',
+  say:'Votre pavé tactile n’est pas cassé. Le petit récepteur de la souris de votre fils était encore branché, et dans ce cas Windows coupe le pavé tactile. J’ai changé le réglage : maintenant, il marche dans tous les cas.',
+  lesson:'Regarde ce qui est branché sur les ports : un accessoire peut changer le comportement du PC.' },
+
+{ id:9, level:2, title:'Ne charge plus', client:'Konan', role:'gérant de boutique',
+  model:'HP ProBook 440 G6', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'5CD9206MXB',
+  soldDays:50, boot:'none', batNow:87,
+  complaint:'Il ne charge plus du tout. Quand je branche le chargeur, le voyant ne s’allume pas.',
+  fiche:['Chargeur remis : HP d’origine 45 W, embout bleu de 4,5 mm','Port de charge : testé OK','Batterie : 88 % de santé','Scellé n° NM-0279 posé'],
+  r:{
+    question:[['Vous utilisez quel chargeur ?','Celui d’origine a été volé au bureau. J’en ai acheté un au marché à 5 000 F. Ça a marché une semaine…'],['Il s’est passé quelque chose juste avant ?','Il y a eu une coupure de courant. Quand le courant est revenu, ça a fait « tac », avec une odeur de brûlé.']],
+    charger:'Chargeur générique sans marque, prévu pour <b>40 W</b>, alors que ce PC demande un chargeur HP de 45 W minimum. L’embout est noirci et a été forcé pour entrer.',
+    visual:'Le <b>connecteur de charge du PC est noirci</b> et légèrement fondu, avec une odeur de brûlé. Pas d’autre dégât.',
+    power:'Batterie à plat. Avec notre chargeur HP d’origine : aucun voyant, aucune charge. Le circuit de charge du PC est endommagé.',
+    open:'Le connecteur de charge et un petit composant de protection juste à côté sont <b>brûlés</b> (traces noires). Aucune trace de liquide.'
+  },
+  answer:'CLIENT', key:['charger','visual','open'],
+  story:'Le PC a été branché sur un chargeur du marché, trop faible et non adapté, au moment d’un retour de courant brutal : le connecteur et le circuit de charge ont brûlé. Chargeur non d’origine et surtension : la réparation est à la charge du client.',
+  say:'Le connecteur a brûlé à cause du chargeur du marché et du retour de courant : ce chargeur n’est pas fait pour cet ordinateur. Ce n’est pas un défaut de la machine. Je peux réparer le connecteur sur devis et vous vendre un chargeur d’origine. Je vous conseille aussi une multiprise avec parafoudre, à cause des coupures.',
+  lesson:'Vérifie toujours le chargeur que le client utilise vraiment.' },
+
+{ id:10, level:2, title:'Le disque qui gratte', client:'M. N’Guessan', role:'enseignant',
+  model:'HP ProBook 650 G2', config:'Core i5 (6e gén.) · 8 Go · disque dur 500 Go', serial:'5CG6243JKD',
+  soldDays:230, boot:'ok', batNow:79,
+  complaint:'Mon disque fait des petits bruits et Windows plante avec un écran bleu. Je l’ai acheté chez vous, vous devez le réparer gratuitement !',
+  fiche:['Disque dur : état « Bon », <b>3 150 heures</b> de fonctionnement, aucun secteur défectueux','Batterie : 82 % de santé','Tous les tests : OK','Scellé n° NM-0102 posé'],
+  r:{
+    question:[['Depuis quand ?','Un mois environ. Et ça empire.'],['Il est tombé, ou il a été cogné ?','Non, jamais. Je l’utilise tous les jours pour préparer mes cours, souvent jusqu’à tard.']],
+    power:'Le PC démarre lentement. On entend de petits « clics » réguliers venant du disque dur.',
+    disk:'État : <b>MAUVAIS</b>. 1 840 secteurs réalloués et des erreurs de lecture. <b>4 800 heures</b> de fonctionnement, contre 3 150 le jour de la livraison : 1 650 heures d’utilisation depuis.',
+    diag:'Test du disque dur : ÉCHEC. Tous les autres tests sont RÉUSSIS.',
+    reliability:'Écrans bleus et erreurs de disque depuis environ un mois. Rien avant.'
+  },
+  answer:'CLIENT', key:['fiche','disk'],
+  story:'Le disque dur est vraiment en fin de vie, et le client n’a rien fait de mal : c’est l’usure d’un disque mécanique très utilisé. Mais la fiche prouve que le disque était sain à la livraison, et le client l’a fait tourner plus de 1 600 heures depuis, pendant presque 8 mois. Ce n’est pas un défaut caché : le remplacement est à sa charge. Un geste commercial (SSD à prix réduit, récupération des fichiers) permet de garder ce client.',
+  say:'Votre disque dur est usé, ce n’est pas de votre faute. Mais il était en parfait état à la livraison, il y a presque 8 mois : regardez la fiche. Je ne peux pas le changer gratuitement. Je vous propose un SSD, beaucoup plus rapide, avec une remise parce que vous êtes notre client, et je récupère vos fichiers.',
+  lesson:'Compare toujours l’état actuel avec la fiche de livraison : c’est elle qui dit si le défaut existait déjà.' },
+
+{ id:11, level:3, title:'Il s’éteint tout seul', client:'M. Traoré', role:'expert-comptable',
+  model:'Dell Latitude 7480', config:'Core i7 (7e gén.) · 16 Go · SSD 256 Go', serial:'Service Tag 6FT3K82',
+  soldDays:25, boot:'ok', batNow:82,
+  complaint:'Depuis une semaine, il s’éteint tout seul après 15 ou 20 minutes, sans prévenir. Je perds mon travail !',
+  fiche:['Tous les tests : OK (test rapide de 5 minutes)','Batterie : 83 % de santé','Scellé n° NM-0322 posé'],
+  r:{
+    question:[['Où utilisez-vous l’ordinateur ?','Souvent sur mon lit, le soir, pour finir mes dossiers.'],['Il fait du bruit quand il chauffe ?','Non, justement, il est très silencieux… Mais il devient brûlant.']],
+    temp:'Le processeur monte à <b>99 °C</b> en 10 minutes, puis le PC se coupe pour se protéger de la surchauffe. Le ventilateur reste à <b>0 tour par minute</b> : il ne tourne pas du tout.',
+    diag:'Test du ventilateur : <b>ÉCHEC</b>, aucune rotation détectée. Tous les autres tests sont RÉUSSIS.',
+    open:'Grilles d’aération et radiateur <b>propres</b> : ni poussière ni fibres de tissu. Le ventilateur ne tourne pas quand le PC chauffe : son moteur est mort.',
+    reliability:'9 arrêts inattendus (événement « Kernel-Power 41 ») depuis une semaine.'
+  },
+  answer:'VENDEUR', key:['temp','diag','open'],
+  story:'Le client utilise son PC sur le lit : ce n’est pas idéal, mais ce n’est pas la cause. Les grilles sont propres et le ventilateur ne tourne pas du tout (test en échec). Un ventilateur qui lâche moins d’un mois après la livraison, sans cause extérieure, c’est un défaut de la machine : on le remplace à nos frais.',
+  say:'Le ventilateur est défectueux, il ne tourne plus : c’est pour ça que l’ordinateur chauffe et s’éteint. C’est pour nous, on le remplace. Un petit conseil : évitez de poser l’ordinateur directement sur le lit, ça bouche les aérations.',
+  lesson:'Une habitude du client n’est pas une preuve : trouve la vraie cause avant d’accuser.' },
+
+{ id:12, level:3, title:'Écran noir, mais il tourne', client:'Mlle Kouassi', role:'étudiante en droit',
+  model:'Lenovo ThinkPad T480', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'PF-1MZ3T8',
+  soldDays:28, boot:'black', batNow:85,
+  complaint:'L’écran reste noir, mais j’entends que l’ordinateur marche : le voyant est allumé et le ventilateur tourne.',
+  fiche:['Écran : impeccable, testé sur fond blanc, photo envoyée','Charnières : fermes','Batterie : 86 % de santé','Scellé n° NM-0305 posé'],
+  r:{
+    question:[['Il est tombé, ou il a reçu un choc ?','Non, je le transporte toujours dans une housse.'],['C’est arrivé d’un coup ?','Ces derniers jours, l’écran clignotait quand je bougeais l’écran. Hier, plus rien.']],
+    power:'Le voyant s’allume, le ventilateur tourne, on entend le son de démarrage de Windows. Écran noir. En éclairant l’écran avec la torche du téléphone, on devine très faiblement l’image : c’est l’<b>éclairage de l’écran</b> qui ne marche plus.',
+    external:'<b>Image parfaite</b> sur l’écran externe (HDMI) : la carte mère et la carte graphique fonctionnent. Le problème vient de l’écran du PC ou de sa nappe, le câble qui passe dans la charnière. Tu peux maintenant utiliser Windows sur l’écran externe.',
+    diag:'Le diagnostic s’affiche sur l’écran du PC… qui reste noir. Résultat illisible.',
+    visual:'Aucune fissure, aucune trace de choc. Charnières fermes, coque en bon état.',
+    open:'Nappe de l’écran bien branchée, pas de corrosion, pas de trace de choc. Rien de visible à l’œil : le défaut est électrique (éclairage de l’écran, ou nappe usée dans la charnière).',
+    settings:'Réglages normaux. Luminosité réglée au maximum.'
+  },
+  answer:'VENDEUR', key:['external','power'],
+  story:'Le PC fonctionne : l’image est parfaite sur un écran externe. C’est l’écran du PC (éclairage ou nappe) qui a lâché, sans choc ni liquide, quatre semaines après la livraison. Les clignotements quand on bougeait l’écran annonçaient une nappe fatiguée. C’est un défaut de la machine : réparation à nos frais.',
+  say:'L’ordinateur lui-même va bien : regardez, sur un autre écran, tout s’affiche. C’est la nappe ou l’éclairage de l’écran qui a lâché, et il n’y a aucune trace de choc. C’est pour nous, on répare.',
+  lesson:'Écran noir ? Branche un écran externe : en 3 minutes, tu sais si c’est l’écran ou le PC.' },
+
+{ id:13, level:3, title:'Mort sans prévenir', client:'Mme Ouattara', role:'commerçante',
+  model:'Dell Latitude 5490', config:'Core i5 (8e gén.) · 8 Go · SSD 256 Go', serial:'Service Tag 3BQ7H63',
+  soldDays:30, boot:'none', batNow:85,
+  complaint:'Il marchait bien jusqu’à hier midi. Il s’est éteint d’un coup pendant que je travaillais, et depuis, plus rien.',
+  fiche:['Tous les tests : OK','Chargeur remis : Dell d’origine 65 W','Batterie : 86 % de santé','Scellé n° NM-0317 posé'],
+  r:{
+    question:[['Il était branché ? Il y a eu une coupure de courant ?','Non, il était sur batterie, pas branché. Pas de coupure.'],['Il est tombé, il a pris de l’eau, quelqu’un l’a ouvert ?','Non, il ne quitte jamais mon bureau.']],
+    charger:'Chargeur Dell d’origine 65 W, celui de la livraison. Testé sur un autre PC Dell : il fonctionne parfaitement.',
+    power:'Avec notre chargeur d’origine : le voyant de charge s’allume une seconde, puis s’éteint. Pas de ventilateur, pas d’image. Même résultat après une réinitialisation (chargeur débranché, bouton d’alimentation maintenu 30 secondes).',
+    open:'Intérieur propre : <b>aucune corrosion</b>, aucune trace de liquide, aucun composant brûlé visible, barrettes de mémoire bien en place.'
+  },
+  answer:'VENDEUR', key:['open','liquid','seal','charger','visual'],
+  story:'Panne franche, sans aucune cause extérieure : pas de liquide, pas de choc, scellé intact, chargeur d’origine qui fonctionne, intérieur propre. Une fois toutes les causes « client » éliminées, il reste un défaut de la carte mère, un mois après la livraison. C’est pour nous : réparation ou échange.',
+  say:'J’ai tout vérifié : pas de choc, pas de liquide, personne ne l’a ouvert, et le chargeur fonctionne. C’est une panne interne de la carte mère, ce n’est pas de votre faute. On s’en occupe : réparation ou échange.',
+  lesson:'Quand toutes les causes « client » sont éliminées, peu après la livraison, c’est à nous de prendre en charge.' },
+
+{ id:14, level:3, title:'« Un ami a juste regardé »', client:'M. Diallo', role:'conducteur de travaux',
+  model:'HP EliteBook 840 G5', config:'Core i7 (8e gén.) · 16 Go (2 × 8 Go) · SSD 512 Go', serial:'5CG8287PLM',
+  soldDays:50, boot:'ok', batNow:85,
+  complaint:'Il est devenu lent et il fait des écrans bleus. Je veux que vous me le changiez.',
+  fiche:['Configuration livrée : <b>16 Go de RAM, 2 barrettes Samsung de 8 Go</b>, SSD 512 Go','Tous les tests : OK','Batterie : 86 % de santé','Scellé n° NM-0281 posé sur la vis centrale du dessous'],
+  r:{
+    question:[['Quelqu’un d’autre a touché à l’ordinateur ?','Non… Enfin, un ami qui s’y connaît a juste regardé. Il voulait le « booster ». Il n’a rien fait.'],['Les problèmes ont commencé quand ?','Il y a deux semaines environ.']],
+    seal:'Scellé <b>déchiré</b>. Deux vis du dessous ont la tête abîmée et une vis manque : le PC a été ouvert par quelqu’un d’autre.',
+    open:'Une des deux barrettes Samsung de 8 Go a été <b>remplacée par une barrette de 4 Go</b> d’une autre marque, mal enfoncée dans son support. Le SSD est d’origine.',
+    diag:'Test de la mémoire : ÉCHEC sur la barrette n° 2. Le PC détecte <b>12 Go</b> de RAM au lieu de 16 Go.',
+    settings:'Réglages normaux. Mais dans Paramètres > Système > Informations système : <b>12 Go</b> de mémoire RAM installée, au lieu des 16 Go livrés.',
+    reliability:'Écrans bleus « MEMORY_MANAGEMENT » (erreur de mémoire) depuis deux semaines.'
+  },
+  answer:'CLIENT', key:['seal','open','diag','settings'],
+  story:'Le scellé est déchiré, des vis sont abîmées, et une barrette de mémoire n’est plus celle livrée : 8 Go remplacés par 4 Go. Le PC a été ouvert par une autre personne, et les écrans bleus viennent de cette barrette mal posée. Une ouverture par un tiers rend le client responsable : la réparation est à sa charge.',
+  say:'Le scellé est déchiré, et une barrette de mémoire n’est plus celle que nous vous avons livrée : regardez la fiche, 2 barrettes de 8 Go à l’origine. Quelqu’un a ouvert l’ordinateur et changé la pièce, peut-être sans mauvaise intention. Dans ce cas, je ne peux pas le prendre en charge gratuitement. Je peux remettre une barrette de 8 Go compatible, sur devis.',
+  lesson:'Le scellé et la configuration notée sur la fiche sont ta meilleure protection.' }
+];
+
+/* ================= Logique du jeu ================= */
+function caseById(id){ return CASES.find(c => c.id === id) || null; }
+function newRun(id){ return {caseId:id, used:0, log:[], done:{}, faults:[], flags:{}, result:null}; }
+function resultText(c, aid){
+  if (c.r && c.r[aid] != null) return c.r[aid];
+  const d = DEF[aid];
+  return typeof d === 'function' ? d(c) : d;
+}
+function applyAction(run, c, aid){
+  const a = ACT[aid];
+  if (!a) return null;
+  if (run.done[aid]) return run.log[run.done[aid].idx];
+  let text = null, imp = false, cost = a.min, record = true, fault = null;
+  if (a.power && c.liquidDanger && !run.done.liquid && !run.flags.wet){ fault = 'wet'; run.flags.wet = true; }
+  if (aid === 'open' && !run.done.seal && !run.flags.seal){ fault = 'seal'; run.flags.seal = true; }
+  if (aid === 'question' || aid === 'fiche'){ text = null; }
+  else if (aid === 'seal' && run.flags.seal){ text = SEAL_LATE; imp = true; }
+  else if (c.boot === 'none' && a.power && aid !== 'power'){
+    imp = true; cost = 1;
+    text = aid === 'external' ? NOPOWER.external : (aid === 'diag' ? NOPOWER.diag : NOPOWER.win);
+  }
+  else if (c.boot === 'black' && a.win && !run.done.external){ imp = true; record = false; cost = 1; text = BLACK_HINT; }
+  else { text = resultText(c, aid); }
+  run.used += cost;
+  const entry = {aid:aid, text:text, imp:imp, cost:cost, at:run.used, fault:fault, retry:!record};
+  run.log.push(entry);
+  if (record) run.done[aid] = {idx:run.log.length - 1, imp:imp};
+  if (fault) run.faults.push(fault);
+  return entry;
+}
+function evidenceOptions(run){
+  const seen = {}, out = [];
+  run.log.forEach(e => { if (e.retry || e.imp || seen[e.aid]) return; seen[e.aid] = true; out.push(e); });
+  return out;
+}
+function scoreRun(run, c, verdict, evidence){
+  const okV = verdict === c.answer;
+  const key = c.key.filter(k => !(k === 'seal' && run.flags.seal));
+  const evFound = evidence != null && key.indexOf(evidence) !== -1 && !!run.done[evidence] && !run.done[evidence].imp;
+  const okE = okV && evFound;
+  const pts = {verdict: okV ? 40 : 0, preuve: okE ? 30 : 0, temps: 0, fiche: run.done.fiche ? 15 : 0, fautes: -20 * run.faults.length};
+  if (okE) pts.temps = run.used <= BUDGET ? 15 : Math.max(0, 15 - (run.used - BUDGET));
+  const total = Math.max(0, Math.min(100, pts.verdict + pts.preuve + pts.temps + pts.fiche + pts.fautes));
+  return {verdict:verdict, evidence:evidence, okV:okV, okE:okE, evFound:evFound, pts:pts, total:total, key:key};
+}
+
+/* ================= Joueurs ================= */
+function emptyStore(){ return {players:[], current:null, progress:{}}; }
+function normalizeStore(s){
+  const out = emptyStore();
+  if (!s || typeof s !== 'object') return out;
+  out.players = Array.isArray(s.players) ? s.players.filter(p => p && typeof p.id === 'string' && typeof p.name === 'string' && p.name.trim()) : [];
+  out.progress = (s.progress && typeof s.progress === 'object') ? s.progress : {};
+  out.current = out.players.some(p => p.id === s.current) ? s.current : (out.players.length ? out.players[0].id : null);
+  return out;
+}
+function rank(avg){
+  if (avg >= 85) return 'Expert du diagnostic';
+  if (avg >= 70) return 'Technicien SAV';
+  if (avg >= 45) return 'Vendeur attentif';
+  return 'Apprenti';
+}
+function playerStats(store, pid){
+  const p = store.progress[pid] || {};
+  const done = CASES.filter(c => p[c.id]);
+  const avg = done.length ? Math.round(done.reduce((s, c) => s + p[c.id].best, 0) / done.length) : null;
+  return {n:done.length, avg:avg, rank: avg == null ? null : rank(avg)};
+}
+function checkName(store, raw){
+  const n = String(raw || '').replace(/\s+/g, ' ').trim();
+  if (!n) return {err:'Écris un prénom.'};
+  if (n.length > 20) return {err:'20 caractères au maximum.'};
+  if (store.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return {err:'Ce prénom existe déjà sur ce téléphone.'};
+  return {name:n};
+}
+
+if (typeof document === 'undefined'){
+  globalThis.__SAV = {CASES, ACTIONS, ACT, BUDGET, newRun, applyAction, scoreRun, evidenceOptions, normalizeStore, playerStats, checkName};
+  return;
+}
+
+/* ================= Interface ================= */
+const STORE_KEY = 'comptoir-sav-nours-v2';
+const OLD_KEY = 'comptoir-sav-nours-v1';
+const TODAY = new Date(); TODAY.setHours(12, 0, 0, 0);
+const $ = (s, r) => (r || document).querySelector(s);
+let store = emptyStore();
+let run = null;
+const ui = {tab:'jouer', view:'home'};
+let vstate = null;
+let lastAct = null;
+const armTimers = {};
+
+const ICON = {
+  talk:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5h16v10H10l-4.5 3.5v-3.5H4z"/></svg>',
+  lens:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5"/><path d="M14.6 14.6 20 20"/></svg>',
+  plug:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0zM12 17v4"/></svg>',
+  win:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 9h17"/></svg>',
+  check:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-9.5"/></svg>',
+  back:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  down:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5 12 15l5.5-5.5"/></svg>'
+};
+
+const STEPS = [
+  ['Écouter', 'Laisse le client tout raconter, puis pose des questions ouvertes. Note ses mots. Ne promets rien et n’accuse personne.'],
+  ['Lire la fiche de livraison', 'Date, état et tests notés ce jour-là, numéro de série, scellé, batterie. Tout ce qui était bon à la livraison et qui ne l’est plus a une cause.'],
+  ['Inspecter, PC éteint', 'Chocs, liquide, scellé et vis, chargeur utilisé. Photographie tout devant le client.'],
+  ['Tester', 'Allume avec notre chargeur. Écran noir : écran externe. Puis le diagnostic du fabricant et, sous Windows, batterie, disque, fiabilité, virus, réglages.'],
+  ['Décider avec une preuve', 'Vendeur, client ou aucune panne. Une décision, c’est une preuve que tu peux montrer.'],
+  ['Expliquer et proposer', 'Montre la preuve calmement, sans accuser. Propose toujours une solution : réparation, devis, geste commercial.']
+];
+const RULES = [
+  ['Liquide d’abord', 'N’allume jamais un PC qui a pu prendre l’eau : le courant aggrave le court-circuit.'],
+  ['Scellé avant capot', 'Contrôle et photographie le scellé avant d’ouvrir. Après, c’est trop tard.'],
+  ['Notre chargeur', 'Teste toujours avec un chargeur d’origine que tu sais bon, pas seulement avec celui du client.'],
+  ['Fichiers à l’abri', 'Sauvegarde les fichiers du client avant toute réinstallation.'],
+  ['Pas de preuve, pas de refus', 'Si tu ne peux pas montrer la cause, la boutique prend en charge.']
+];
+const SIGNS = [
+  ['Fissure en étoile qui part d’un point, capot enfoncé', 'Choc ou pression', 'CLIENT'],
+  ['Touches collantes, auréoles, corrosion verte ou blanche', 'Liquide renversé', 'CLIENT'],
+  ['Scellé déchiré, vis abîmées, pièce différente de la fiche', 'Ouvert par un tiers', 'CLIENT'],
+  ['Connecteur noirci, chargeur du marché, retour de courant', 'Surtension ou chargeur non adapté', 'CLIENT'],
+  ['Virus, logiciels crackés, disque plein', 'Usage du client', 'CLIENT'],
+  ['Pièce usée après de longs mois, saine à la livraison', 'Usure après une longue utilisation', 'CLIENT'],
+  ['Défaut déjà là à la livraison (batterie, heures du disque)', 'Défaut caché', 'VENDEUR'],
+  ['Panne peu après la livraison, sans aucune cause extérieure', 'Défaut de la machine', 'VENDEUR'],
+  ['Mode Avion, touche de fonction, son coupé, seuil de charge', 'Réglage', 'AUCUNE'],
+  ['Batterie qui perd quelques % en plusieurs mois', 'Usure normale', 'AUCUNE']
+];
+const LEXIQUE = [
+  ['BIOS (ou UEFI)', 'Le petit programme qui démarre le PC avant Windows. On y entre avec une touche au démarrage : F1, F2 ou F10 selon la marque.'],
+  ['Carte mère', 'La grande carte électronique sur laquelle tout est branché.'],
+  ['Dalle', 'La partie de l’écran qui affiche l’image.'],
+  ['Rétroéclairage', 'La lumière derrière la dalle. S’il lâche, l’image est là mais toute noire : on la devine à la lampe torche.'],
+  ['Nappe', 'Câble plat qui relie l’écran ou le clavier à la carte mère. Celle de l’écran passe dans la charnière.'],
+  ['RAM (barrette)', 'La mémoire de travail. Une barrette défectueuse ou mal posée provoque des écrans bleus.'],
+  ['Disque dur et SSD', 'Le stockage. Le disque dur est mécanique et peut faire du bruit en s’usant. Le SSD est silencieux et plus rapide.'],
+  ['SMART', 'Le carnet de santé du disque : heures de fonctionnement, erreurs, secteurs réalloués. CrystalDiskInfo le lit.'],
+  ['Cycle de batterie', 'Une charge complète, de 0 à 100 %. Plus il y a de cycles, plus la batterie est usée.'],
+  ['Corrosion', 'Dépôt vert ou blanc laissé par un liquide sur les composants.'],
+  ['Surtension', 'Pic de courant, par exemple au retour du courant après une coupure.'],
+  ['Scellé', 'Petite étiquette numérotée posée sur une vis. Déchirée, elle prouve que le PC a été ouvert.']
+];
+const CHECK = [
+  ['À l’atelier, avant de livrer', [
+    'Noter le modèle, la configuration (processeur, RAM, disque) et le numéro de série.',
+    'Mesurer la batterie avec le rapport batterie : % de santé et nombre de cycles.',
+    'Contrôler le disque avec CrystalDiskInfo : état et heures de fonctionnement.',
+    'Tester chaque touche, l’écran sur fond blanc et noir, le pavé tactile, le Wi-Fi, le son, la webcam, chaque port USB et la charge.',
+    'Laisser tourner le PC 15 minutes sur une tâche lourde : le ventilateur doit souffler et le PC ne doit pas s’éteindre.',
+    'Poser un scellé numéroté sur une vis du dessous et noter son numéro.',
+    'Prendre 4 photos : dessus, dessous avec le scellé, écran allumé, clavier.'
+  ]],
+  ['À la livraison, avec le client', [
+    'Faire tester au client l’écran, le clavier, le Wi-Fi et la charge, avant le paiement.',
+    'Noter le chargeur remis : marque et puissance en watts.',
+    'Donner les 3 conseils : chargeur d’origine, multiprise avec parafoudre, pas de boisson près du clavier.'
+  ]],
+  ['Juste après', [
+    'Envoyer la fiche et les photos sur WhatsApp, et garder la réponse du client.'
+  ]]
+];
+const WA_TEXT = [
+  'Bonjour [Prénom] 👋 Merci pour votre confiance !',
+  'Voici la fiche de votre ordinateur :',
+  '💻 [Modèle] · N° de série [S/N]',
+  'Batterie : [xx] % de santé · Disque : état [Bon]',
+  '✅ Testé avec vous : écran, clavier, pavé tactile, Wi-Fi, son, webcam, ports USB, charge.',
+  '📸 Les photos de l’état à la livraison sont ci-dessous.',
+  'Pour qu’il dure longtemps : chargeur d’origine uniquement, multiprise avec parafoudre, pas de boisson près du clavier.',
+  'Tout est en ordre pour vous ?'
+].join('\n');
+
+/* ---------- Mémoire du téléphone ---------- */
+function loadStore(){
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return normalizeStore(JSON.parse(raw));
+    const old = localStorage.getItem(OLD_KEY);
+    if (old){
+      const p = JSON.parse(old);
+      if (p && typeof p === 'object' && Object.keys(p).length) return normalizeStore({players:[{id:'p1', name:'Moi'}], current:'p1', progress:{p1:p}});
+    }
+  } catch (e) {}
+  return emptyStore();
+}
+function saveStore(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {} }
+function me(){ return store.players.find(p => p.id === store.current) || null; }
+function prog(pid){
+  const k = pid || store.current;
+  if (!k) return {};
+  if (!store.progress[k]) store.progress[k] = {};
+  return store.progress[k];
+}
+function addPlayer(name){
+  const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  store.players.push({id:id, name:name});
+  store.progress[id] = {};
+  store.current = id;
+  run = null;
+  ui.view = 'home';
+  saveStore();
+}
+function switchPlayer(id){
+  if (!store.players.some(p => p.id === id)) return;
+  store.current = id;
+  run = null;
+  ui.view = 'home';
+  saveStore();
+}
+function deletePlayer(id){
+  store.players = store.players.filter(p => p.id !== id);
+  delete store.progress[id];
+  if (store.current === id){ store.current = store.players.length ? store.players[0].id : null; run = null; ui.view = 'home'; }
+  saveStore();
+}
+
+/* ---------- Aides ---------- */
+function cur(){ return run ? caseById(run.caseId) : null; }
+function saleDate(c){ const d = new Date(TODAY); d.setDate(d.getDate() - c.soldDays); return d; }
+function fmtDate(d){ return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'}); }
+function ago(days){
+  if (days < 14) return 'il y a ' + days + ' jours';
+  if (days < 60) return 'il y a ' + Math.round(days / 7) + ' semaines';
+  return 'il y a ' + Math.round(days / 30.4) + ' mois';
+}
+function initial(name){ return (name.replace(/^(M\.|Mme|Mlle)\s+/, '').trim().charAt(0) || '?').toUpperCase(); }
+function mood(u){
+  if (u <= 20) return 'Le client patiente.';
+  if (u <= 35) return 'Le client regarde sa montre.';
+  if (u <= BUDGET) return 'Le client soupire.';
+  return 'Le client s’impatiente.';
+}
+function stats(pid){ return playerStats(store, pid || store.current); }
+function testsCount(){ return run.log.filter(e => !e.retry).length; }
+function excerpt(e){
+  if (e.aid === 'question') return 'Ce que le client a répondu.';
+  if (e.aid === 'fiche') return 'Date de livraison et état noté ce jour-là.';
+  const t = strip(e.text);
+  return t.length > 110 ? t.slice(0, 108).replace(/\s+\S*$/, '') + '…' : t;
+}
+function ledsHTML(pid){
+  const p = prog(pid);
+  return CASES.map(c => {
+    const s = p[c.id];
+    const cls = !s ? '' : (s.best >= 70 ? 'hi' : (s.best >= 45 ? 'mid' : 'lo'));
+    return `<i class="${cls}"></i>`;
+  }).join('');
+}
+function bilanText(pid){
+  const pl = store.players.find(p => p.id === pid);
+  if (!pl) return '';
+  const p = prog(pid), s = stats(pid);
+  const done = CASES.filter(c => p[c.id]);
+  const lines = ['Comptoir SAV · Bilan de ' + pl.name, 'Dossiers traités : ' + s.n + '/' + CASES.length];
+  if (s.avg != null) lines.push('Score moyen : ' + s.avg + '/100 · Rang : ' + s.rank);
+  if (done.length) lines.push('Scores : ' + done.map(c => pad2(c.id) + ' → ' + p[c.id].best).join(' · '));
+  const weak = done.filter(c => p[c.id].best < 70);
+  if (weak.length) lines.push('À revoir : dossiers ' + weak.map(c => pad2(c.id)).join(', '));
+  const todo = CASES.length - done.length;
+  if (todo) lines.push('Reste à faire : ' + todo + ' dossier' + (todo > 1 ? 's' : ''));
+  lines.push('Le ' + fmtDate(new Date()));
+  return lines.join('\n');
+}
+
+/* ---------- Rendu général ---------- */
+function syncNav(){
+  document.querySelectorAll('.tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === ui.tab)));
+  document.querySelectorAll('.bottomnav [data-tab]').forEach(b => { if (b.dataset.tab === ui.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+}
+function renderPlayerSlot(){
+  const slot = $('#player-slot');
+  const p = me();
+  slot.innerHTML = p ? `<button type="button" class="player-chip" data-players aria-label="${esc('Joueur : ' + p.name + '. Changer de joueur')}"><span class="avatar xs" aria-hidden="true">${esc(initial(p.name))}</span><span class="pc-name">${esc(p.name)}</span>${ICON.down}</button>` : '';
+}
+function renderApp(){
+  syncNav();
+  renderPlayerSlot();
+  const app = $('#app');
+  if (ui.tab === 'methode') app.innerHTML = methodHTML();
+  else if (ui.tab === 'fiche'){ app.innerHTML = ficheTabHTML(); updateChecklist(); }
+  else if (ui.tab === 'equipe') app.innerHTML = equipeHTML();
+  else if (!me()) app.innerHTML = welcomeHTML();
+  else if (ui.view === 'case' && run && cur()) app.innerHTML = caseHTML();
+  else if (ui.view === 'debrief' && run && run.result && cur()) app.innerHTML = debriefHTML();
+  else { ui.view = 'home'; app.innerHTML = homeHTML(); }
+  syncInstall();
+}
+function nameForm(id, label, cta){
+  return `<form class="field" data-form="add" novalidate>
+    <label for="${id}">${fr(label)}</label>
+    <div class="form-row"><input class="input" id="${id}" name="pname" type="text" maxlength="20" autocomplete="given-name" autocapitalize="words" enterkeyhint="done" placeholder="Ex. Aroun"><button type="submit" class="btn led">${fr(cta)}</button></div>
+    <p class="form-err" aria-live="polite"></p>
+  </form>`;
+}
+
+/* ---------- Bienvenue ---------- */
+function welcomeHTML(){
+  const stamps = VORDER.map((k, i) => `<span class="stamp ${VERDICTS[k].cls} r${i + 1}">${VERDICTS[k].stamp}</span>`).join('');
+  return `<section class="welcome">
+    <div class="paper welcome-card">
+      <p class="kicker">NouR’s Market · Jeu de formation</p>
+      <h1>${fr('Qui joue ?')}</h1>
+      <p class="lead">${fr('Un client revient avec son PC. Tu mènes l’enquête, puis tu décides qui prend en charge. Entre ton prénom : ta progression est gardée sur ce téléphone, et plusieurs personnes peuvent jouer ici, chacune avec son nom.')}</p>
+      <div class="welcome-stamps" aria-hidden="true">${stamps}</div>
+      ${nameForm('player-name', 'Ton prénom', 'Commencer')}
+      <p class="tip">${fr('Pour l’avoir comme une application, installe-la sur l’écran d’accueil du téléphone.')}<button type="button" class="btn sm led install-btn" data-install hidden>Installer l’application</button><button type="button" class="linkbtn" data-tab="equipe">Voir comment</button></p>
+    </div>
+  </section>`;
+}
+
+/* ---------- Accueil ---------- */
+function homeHTML(){
+  const pl = me(), p = prog(), s = stats();
+  let target = CASES.find(c => !p[c.id]);
+  let cta;
+  if (target) cta = (s.n ? 'Continuer : dossier ' : 'Ouvrir le dossier ') + pad2(target.id);
+  else { target = CASES.slice().sort((a, b) => p[a.id].best - p[b.id].best)[0]; cta = 'Améliorer le dossier ' + pad2(target.id); }
+  const legend = VORDER.map((k, i) => `<li><span class="stamp ${VERDICTS[k].cls} r${i + 1}">${VERDICTS[k].stamp}</span><span>${fr(VERDICTS[k].short)}</span></li>`).join('');
+  const reflexes = [
+    ['Fiche en premier', 'La fiche de livraison dit dans quel état la machine est partie. C’est ta référence.'],
+    ['Liquide d’abord', 'N’allume jamais un PC qui a pu prendre l’eau. Cherche les traces avant de brancher.'],
+    ['Scellé avant capot', 'Contrôle et photographie le scellé avant d’ouvrir. Après, c’est trop tard.']
+  ].map(r => `<li><b>${fr(r[0])}</b><span>${fr(r[1])}</span></li>`).join('');
+  const levels = [1, 2, 3].map(lv => `<section class="level"><h2 class="sec-t">Niveau ${lv} · ${LEVELS[lv]}</h2><div class="d-grid">${CASES.filter(c => c.level === lv).map(cardHTML).join('')}</div></section>`).join('');
+  return `
+  <section class="hero">
+    <div>
+      <p class="kicker">${esc('Bonjour ' + pl.name)} · ${CASES.length} dossiers</p>
+      <h1>${fr('Un client revient avec son PC. À toi de prouver d’où vient la panne.')}</h1>
+      <p class="lead">${fr('Interroge, inspecte, teste, puis tamponne ton verdict. Chaque test prend du temps, comme au comptoir : le client attend.')}</p>
+      <div class="hero-cta"><button type="button" class="btn led" data-start="${target.id}">${fr(cta)}</button><button type="button" class="btn ghost" data-tab="methode">Lire la méthode</button></div>
+    </div>
+    <div class="paper legend">
+      <p class="kicker">Les trois verdicts possibles</p>
+      <ul>${legend}</ul>
+    </div>
+  </section>
+  <section class="reflexes"><h2 class="sec-t">Trois réflexes avant le premier test</h2><ul class="dashed-cards">${reflexes}</ul></section>
+  <section class="prog paper" aria-label="Ta progression">
+    <div class="prog-stats">
+      <div class="stat"><span class="k">Dossiers traités</span><span class="v">${s.n}<small>/${CASES.length}</small></span></div>
+      <div class="stat"><span class="k">Score moyen</span><span class="v">${s.avg == null ? '–' : s.avg}<small>/100</small></span></div>
+      <div class="stat"><span class="k">Ton rang</span><span class="v">${s.avg == null ? 'À découvrir' : s.rank}</span></div>
+    </div>
+    <div class="prog-actions">
+      ${s.n ? '<button type="button" class="btn sm" data-tab="equipe">Envoyer mon bilan</button><button type="button" class="linkbtn" data-reset>Effacer ma progression</button>' : `<p class="muted small">${fr('Ton score s’affiche ici après ton premier dossier.')}</p>`}
+    </div>
+  </section>
+  ${levels}`;
+}
+function cardHTML(c){
+  const p = prog()[c.id];
+  const dots = [1, 2, 3].map(i => `<i class="${i <= c.level ? 'on' : ''}"></i>`).join('');
+  return `<button type="button" class="dossier" data-start="${c.id}">
+    <span class="d-top"><span class="d-no">Dossier ${pad2(c.id)}</span><span class="lvl" aria-hidden="true">${dots}</span><span class="sr">Niveau ${LEVELS[c.level].toLowerCase()}</span></span>
+    <span class="d-title">${fr(c.title)}</span>
+    <span class="d-meta">${esc(c.client)} · ${esc(c.model)}</span>
+    <span class="d-quote">${fr('« ' + c.complaint + ' »')}</span>
+    <span class="d-foot">${p ? 'Meilleur score <b>' + p.best + '</b>/100' : 'À traiter'}</span>
+  </button>`;
+}
+
+/* ---------- Dossier en cours ---------- */
+function caseHTML(){
+  const c = cur();
+  return `
+  <div class="casebar">
+    <button type="button" class="btn ghost sm back" data-nav="home">${ICON.back}<span>Dossiers</span></button>
+    <div class="cb-title"><span class="cb-no">Dossier ${pad2(c.id)} · ${LEVELS[c.level]}</span><span class="cb-name">${fr(c.title)}</span></div>
+    ${timerHTML()}
+    <button type="button" class="btn led verdict-btn" data-open-verdict>Rendre le verdict</button>
+  </div>
+  <div class="bench">
+    <section class="ticket paper" aria-label="Le client">
+      <p class="ticket-eyebrow"><span>Fiche d’intervention</span><span>SAV-${pad2(c.id)}</span></p>
+      <div class="client">
+        <span class="avatar" aria-hidden="true">${esc(initial(c.client))}</span>
+        <div><p class="client-name">${esc(c.client)}<span>, ${esc(c.role)}</span></p><p class="client-pc">${esc(c.model)} <span class="muted">· ${esc(c.config)}</span></p></div>
+      </div>
+      <blockquote class="complaint">${fr('« ' + c.complaint + ' »')}</blockquote>
+      ${run.faults.length ? `<p class="faults-count">${run.faults.length} faute${run.faults.length > 1 ? 's' : ''} grave${run.faults.length > 1 ? 's' : ''} de méthode</p>` : ''}
+    </section>
+    <section class="mat" aria-label="Les outils">
+      <p class="mat-t">Le tapis<span>${fr('Choisis un test. Il s’ajoute à ton carnet avec son temps.')}</span></p>
+      ${GROUPS.map(groupHTML).join('')}
+    </section>
+    <section class="log paper" aria-label="Carnet d’observations">
+      <h2 class="log-t">Carnet d’observations</h2>
+      ${logHTML(c)}
+    </section>
+  </div>`;
+}
+function timerHTML(){
+  const used = run.used, over = Math.max(0, used - BUDGET);
+  let segs = '';
+  for (let i = 1; i <= BUDGET; i++) segs += `<i class="${i <= used ? 'on' : ''}"></i>`;
+  return `<div class="timer${over ? ' over' : ''}" role="img" aria-label="Temps utilisé : ${used} minutes sur ${BUDGET}">
+    <div class="t-row"><span>Temps</span><span class="t-val">${used}<small> / ${BUDGET} min</small></span>${over ? `<span class="t-over">+${over} min</span>` : ''}<span class="t-mood">${fr(mood(used))}</span></div>
+    <div class="segs" aria-hidden="true">${segs}</div>
+  </div>`;
+}
+function groupHTML(g){
+  return `<div class="grp">
+    <div class="grp-h"><span class="ico">${ICON[g.icon]}</span><span class="grp-name">${g.name}</span><span class="grp-hint">${fr(g.hint)}</span></div>
+    <div class="tools">${ACTIONS.filter(a => a.g === g.id).map(toolHTML).join('')}</div>
+  </div>`;
+}
+function toolHTML(a){
+  const d = run.done[a.id];
+  let cls = 'tool', meta = a.min + ' min';
+  if (d){ cls += d.imp ? ' done imp' : ' done'; meta = ICON.check + '<span>' + (d.imp ? 'Tenté · relire' : 'Fait · relire') + '</span>'; }
+  return `<button type="button" class="${cls}" data-act="${a.id}"><span class="tool-name">${fr(a.name)}</span><span class="tool-meta">${meta}</span></button>`;
+}
+function logHTML(c){
+  if (!run.log.length) return `<p class="empty">${fr('Rien pour l’instant. Choisis un outil sur le tapis : chaque constat s’inscrit ici, avec l’heure.')}</p>`;
+  return `<ol class="entries">${run.log.map(e => entryHTML(e, c)).join('')}</ol>`;
+}
+function entryHTML(e, c){
+  return `<li class="entry${e.imp ? ' imp' : ''}">
+    <span class="e-time">${pad2(e.at)} min</span>
+    <div class="e-main">
+      <p class="e-name">${fr(ACT[e.aid].name)}${e.retry ? ' <span class="tag">tentative</span>' : ''}</p>
+      <div class="e-body">${bodyHTML(e, c)}</div>
+      ${e.fault ? `<p class="alert">${fr(FAULTS[e.fault])}</p>` : ''}
+    </div>
+  </li>`;
+}
+function bodyHTML(e, c){
+  if (e.aid === 'question') return dialogueHTML(c);
+  if (e.aid === 'fiche') return ficheHTML(c);
+  return `<p>${fr(e.text)}</p>`;
+}
+function dialogueHTML(c){
+  return `<dl class="dialogue">${c.r.question.map(qa => `<dt>Toi</dt><dd>${fr(qa[0])}</dd><dt>${esc(c.client)}</dt><dd class="a">${fr(qa[1])}</dd>`).join('')}</dl>`;
+}
+function ficheHTML(c){
+  return `<div class="fiche">
+    <div class="fiche-head"><span>Fiche de livraison</span><span>NouR’s Market</span></div>
+    <dl>
+      <dt>Client</dt><dd>${esc(c.client)}</dd>
+      <dt>Modèle</dt><dd>${esc(c.model)}</dd>
+      <dt>Configuration</dt><dd>${esc(c.config)}</dd>
+      <dt>N° de série</dt><dd class="mono">${esc(c.serial)}</dd>
+      <dt>Livré et payé le</dt><dd>${fmtDate(saleDate(c))} <span class="muted">(${ago(c.soldDays)})</span></dd>
+      <dt>À la livraison</dt><dd>Testé par le client avant paiement</dd>
+    </dl>
+    <p class="fiche-notes-t">Notes de l’atelier</p>
+    <ul>${c.fiche.map(n => `<li>${fr(n)}</li>`).join('')}</ul>
+  </div>`;
+}
+
+/* ---------- Feuillets ---------- */
+function showSheet(html){
+  const dlg = $('#sheet'), inner = $('#sheet-in');
+  inner.innerHTML = html;
+  if (!dlg.open){
+    if (typeof dlg.showModal === 'function'){ try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); } }
+    else dlg.setAttribute('open', '');
+  }
+  inner.scrollTop = 0;
+  const t = $('#sheet-title');
+  if (t) t.focus({preventScroll:true});
+}
+function closeSheet(){
+  const dlg = $('#sheet');
+  if (!dlg.open) return;
+  if (typeof dlg.close === 'function') dlg.close(); else { dlg.removeAttribute('open'); onSheetClosed(); }
+}
+function onSheetClosed(){
+  vstate = null;
+  if (lastAct){ const b = document.querySelector('[data-act="' + lastAct + '"]'); if (b) b.focus({preventScroll:true}); }
+}
+function sheetHead(eyebrow, title, sub){
+  return `<div class="sheet-head"><p class="sheet-eyebrow">${eyebrow}</p><h2 id="sheet-title" tabindex="-1">${title}</h2>${sub ? `<p class="sheet-sub">${sub}</p>` : ''}<button type="button" class="x" data-close aria-label="Fermer">${ICON.x}</button></div>`;
+}
+function openResult(e){
+  const c = cur(), a = ACT[e.aid];
+  vstate = null;
+  showSheet(`
+    ${sheetHead('Constat · ' + (e.retry ? 'tentative, 1 min perdue' : '+' + e.cost + ' min'), fr(a.name))}
+    <div class="sheet-body">${bodyHTML(e, c)}</div>
+    ${e.fault ? `<p class="alert">${fr(FAULTS[e.fault])}</p>` : ''}
+    <details class="how"><summary>Comment faire en vrai</summary><p>${fr(a.how)}</p></details>
+    <div class="sheet-actions"><button type="button" class="btn primary" data-close>Noter au carnet</button></div>`);
+}
+function openVerdict(){
+  lastAct = null;
+  vstate = {step:1, verdict:null, evidence:null};
+  renderVerdict();
+}
+function renderVerdict(){
+  const c = cur();
+  if (vstate.step === 1){
+    const n = testsCount();
+    showSheet(`
+      ${sheetHead('Dossier ' + pad2(c.id) + ' · Verdict', fr('Qui prend en charge ?'), fr('Tu as fait ' + n + ' test' + (n > 1 ? 's' : '') + ' en ' + run.used + ' min.'))}
+      <div class="choices">${VORDER.map(k => `<button type="button" class="choice ${VERDICTS[k].cls}${vstate.verdict === k ? ' sel' : ''}" data-pick="${k}" aria-pressed="${vstate.verdict === k}"><span class="stamp">${VERDICTS[k].stamp}</span><span class="choice-desc">${fr(VERDICTS[k].desc)}</span></button>`).join('')}</div>
+      <div class="sheet-actions"><button type="button" class="btn ghost" data-close>Continuer l’enquête</button><button type="button" class="btn primary" data-vnext${vstate.verdict ? '' : ' disabled'}>Choisir ma preuve</button></div>`);
+  } else {
+    const opts = evidenceOptions(run);
+    const list = opts.length
+      ? `<div class="ev-list" role="radiogroup" aria-label="Ta preuve principale">${opts.map(e => `<label class="ev"><input type="radio" name="ev" id="ev-${e.aid}" value="${e.aid}"${vstate.evidence === e.aid ? ' checked' : ''}><span><b>${fr(ACT[e.aid].name)}</b><small>${fr(excerpt(e))}</small></span></label>`).join('')}</div>`
+      : `<p class="alert">${fr('Tu n’as fait aucun test utilisable : ton verdict partira sans preuve.')}</p>`;
+    showSheet(`
+      ${sheetHead('Verdict · ' + VERDICTS[vstate.verdict].stamp, 'Ta preuve principale', fr('Quel constat prouve ta décision ? C’est ce que tu montreras au client.'))}
+      ${list}
+      <div class="sheet-actions"><button type="button" class="btn ghost" data-vback>Changer de verdict</button><button type="button" class="btn led" data-vconfirm${opts.length && !vstate.evidence ? ' disabled' : ''}>Tamponner le verdict</button></div>`);
+  }
+}
+function confirmVerdict(){
+  const c = cur();
+  run.result = scoreRun(run, c, vstate.verdict, vstate.evidence);
+  const p = prog(), prev = p[c.id];
+  p[c.id] = {best: prev ? Math.max(prev.best, run.result.total) : run.result.total, last: run.result.total, plays: (prev ? prev.plays : 0) + 1};
+  saveStore();
+  ui.view = 'debrief';
+  closeSheet();
+  renderApp();
+  window.scrollTo(0, 0);
+  const h = $('#dbf-title');
+  if (h) h.focus({preventScroll:true});
+}
+function openPlayers(){
+  lastAct = null;
+  vstate = null;
+  const rows = store.players.map(p => {
+    const s = stats(p.id), isMe = p.id === store.current;
+    return `<li class="ps-row"><span class="avatar sm" aria-hidden="true">${esc(initial(p.name))}</span><div class="ps-main"><p class="pl-name">${esc(p.name)}</p><p class="pl-sub">${s.n}/${CASES.length} dossiers${s.avg == null ? '' : ' · moyenne ' + s.avg}</p></div>${isMe ? '<span class="tag ok">en cours</span>' : `<button type="button" class="btn sm" data-switch="${p.id}">Jouer</button>`}</li>`;
+  }).join('');
+  showSheet(`
+    ${sheetHead('Ce téléphone', fr('Qui joue ?'), fr('Chaque joueur garde ses scores.'))}
+    <ul class="ps-list">${rows}</ul>
+    ${nameForm('player-name-sheet', 'Ajouter un joueur', 'Ajouter')}`);
+}
+
+/* ---------- Bilan d’un dossier ---------- */
+function debriefHTML(){
+  const c = cur(), R = run.result, V = VERDICTS[c.answer], mine = R.verdict ? VERDICTS[R.verdict] : null;
+  const word = R.total >= 85 ? 'Diagnostic d’expert' : R.total >= 70 ? 'Bon diagnostic' : R.total >= 45 ? 'Diagnostic incomplet' : 'À reprendre';
+  const next = caseById(c.id + 1);
+  const over = Math.max(0, run.used - BUDGET);
+  const evName = R.evidence ? ACT[R.evidence].name : null;
+  const rows = [
+    ['Verdict', R.okV ? 'Le bon verdict' : 'Ce n’était pas le bon verdict', R.pts.verdict + '/40'],
+    ['Preuve décisive', R.okE ? evName : (!evName ? 'Aucune preuve choisie' : (R.okV ? evName + ' : ce constat ne prouvait pas la décision' : 'Comptée seulement avec le bon verdict')), R.pts.preuve + '/30'],
+    ['Temps', run.used + ' min sur ' + BUDGET + (R.okE ? '' : ' · compté seulement avec la bonne preuve'), R.pts.temps + '/15'],
+    ['Réflexe fiche de livraison', run.done.fiche ? 'Fiche lue' : 'Fiche non lue', R.pts.fiche + '/15']
+  ];
+  if (run.faults.length) rows.push(['Fautes graves', run.faults.length + ' × 20 points', '−' + Math.abs(R.pts.fautes)]);
+  const table = `<table class="score-t"><tbody>${rows.map(r => `<tr><td>${fr(r[0])}<small>${fr(r[1])}</small></td><td>${r[2]}</td></tr>`).join('')}<tr class="total"><td>Total</td><td>${R.total}/100</td></tr></tbody></table>`;
+
+  const keys = c.key.map(k => {
+    const d = run.done[k];
+    const lost = k === 'seal' && run.flags.seal;
+    const found = d && !d.imp;
+    const tag = lost ? '<span class="tag lost">preuve perdue</span>' : (found ? '<span class="tag ok">trouvé</span>' : '<span class="tag">non fait</span>');
+    const body = k === 'fiche' ? `<ul>${c.fiche.map(n => `<li>${fr(n)}</li>`).join('')}</ul>` : `<p>${fr(resultText(c, k))}</p>`;
+    return `<li class="key-item"><p class="key-name">${fr(ACT[k].name)} ${tag}</p>${body}</li>`;
+  }).join('');
+
+  const errs = [];
+  run.faults.forEach(f => errs.push(FAULTS[f]));
+  if (!run.done.fiche) errs.push('Tu n’as pas lu la fiche de livraison. C’est la première chose à faire : elle dit dans quel état la machine est partie.');
+  if (over) errs.push('Tu as dépassé le temps de ' + over + ' min. Choisis les tests qui peuvent vraiment trancher.');
+  if (R.okV && !R.okE) errs.push('Bon verdict, mais sans la bonne preuve. Face au client, tu dois pouvoir montrer ce qui prouve ta décision.');
+  if (!R.okV && R.evFound) errs.push('Tu avais trouvé la bonne preuve, mais tu l’as mal interprétée. Relis ce qu’elle dit sur l’origine de la panne.');
+  if (!R.okV && !R.key.some(k => run.done[k] && !run.done[k].imp)) errs.push('Tu n’as fait aucun des tests qui tranchaient : regarde lesquels il fallait faire.');
+  const errHTML = errs.length ? `<ul class="errs">${errs.map(t => `<li>${fr(t)}</li>`).join('')}</ul>` : `<p>${fr('Aucune faute de méthode. Bien joué !')}</p>`;
+
+  const mineLine = !mine ? '' : (R.okV ? fr('Ton verdict : le même. Bien vu !') : fr('Ton verdict : « ' + mine.stamp + ' ». Ce n’était pas le bon.'));
+  return `
+  <div class="dbf">
+    <div class="dbf-top paper">
+      <div>
+        <p class="kicker">Dossier ${pad2(c.id)} · ${LEVELS[c.level]} · Bilan</p>
+        <h1 id="dbf-title" tabindex="-1">${fr(c.title)}</h1>
+        <p class="muted">${esc(c.client)} · ${esc(c.model)}</p>
+      </div>
+      <div class="dbf-score"><span class="score-n">${R.total}</span><span class="score-d">sur 100</span><span class="score-w">${fr(word)}</span></div>
+      <div class="dbf-stamp"><span class="stamp big thump ${V.cls}">${V.stamp}</span><p class="mine">${mineLine}</p></div>
+    </div>
+    <div class="dbf-grid">
+      <section class="paper pad"><h2>Le détail de ton score</h2>${table}</section>
+      <section class="paper pad"><h2>Ce qui s’est vraiment passé</h2><p>${fr(c.story)}</p></section>
+      <section class="paper pad span2"><h2>${c.key.length > 1 ? 'Les constats qui tranchent' : 'Le constat qui tranche'}</h2><ul class="keys">${keys}</ul>${c.key.length > 1 ? `<p class="keys-note">${fr('Un seul de ces constats suffisait comme preuve principale.')}</p>` : ''}</section>
+      <section class="paper pad"><h2>Tes erreurs de méthode</h2>${errHTML}</section>
+      <section class="paper pad"><h2>À dire au client</h2><blockquote class="say">${fr('« ' + c.say + ' »')}</blockquote></section>
+      <section class="lesson span2"><p class="lesson-k">Leçon terrain</p><p class="lesson-t">${fr(c.lesson)}</p></section>
+    </div>
+    <div class="dbf-actions">
+      ${next ? `<button type="button" class="btn led" data-start="${next.id}">Dossier suivant · ${pad2(next.id)}</button>` : '<button type="button" class="btn led" data-tab="equipe">Voir mon bilan et l’envoyer</button>'}
+      <button type="button" class="btn" data-start="${c.id}">Rejouer ce dossier</button>
+      <button type="button" class="btn ghost" data-nav="home">Tous les dossiers</button>
+    </div>
+  </div>`;
+}
+
+/* ---------- Équipe ---------- */
+function equipeHTML(){
+  const list = store.players.map(p => ({p:p, s:stats(p.id)}))
+    .sort((a, b) => ((b.s.avg == null ? -1 : b.s.avg) - (a.s.avg == null ? -1 : a.s.avg)) || (b.s.n - a.s.n));
+  const rows = list.map((it, i) => {
+    const isMe = it.p.id === store.current;
+    return `<li class="pl-row">
+      <span class="pl-pos">${i + 1}</span>
+      <span class="avatar sm" aria-hidden="true">${esc(initial(it.p.name))}</span>
+      <div class="pl-main">
+        <p class="pl-name">${esc(it.p.name)}${isMe ? ' <span class="tag ok">en cours</span>' : ''}</p>
+        <p class="pl-sub">${it.s.n}/${CASES.length} dossiers · ${it.s.rank ? it.s.rank : 'pas encore classé'}</p>
+        <div class="leds" role="img" aria-label="${it.s.n} dossiers joués sur ${CASES.length}">${ledsHTML(it.p.id)}</div>
+      </div>
+      <span class="pl-score">${it.s.avg == null ? '–' : it.s.avg}<small>moyenne</small></span>
+      <div class="pl-actions">${isMe ? '' : `<button type="button" class="btn sm" data-switch="${it.p.id}">Jouer</button>`}<button type="button" class="btn sm ghost danger" data-del="${it.p.id}">Supprimer</button></div>
+    </li>`;
+  }).join('');
+  const pl = me();
+  const bilan = pl ? bilanText(pl.id) : '';
+  const canSend = pl && stats().n > 0;
+  const sendBlock = !pl
+    ? `<p class="muted">${fr('Ajoute d’abord ton prénom pour jouer.')}</p>`
+    : (canSend
+      ? `<div class="wa-msg" id="bilan-text">${esc(bilan)}</div>
+         <div class="row-btns"><a class="btn led" href="https://wa.me/?text=${encodeURIComponent(bilan)}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a><button type="button" class="btn" data-copy-bilan>Copier le bilan</button></div>`
+      : `<p class="muted">${fr('Joue au moins un dossier pour pouvoir envoyer ton bilan.')}</p>`);
+  return `<article class="doc">
+    <header class="doc-head"><p class="kicker">Équipe</p><h1>Tout le monde au comptoir</h1><p class="lead">${fr('Plusieurs personnes peuvent jouer sur ce téléphone, chacune avec son prénom et ses scores. Sur un autre téléphone, chaque vendeur a sa propre progression et envoie son bilan au responsable.')}</p></header>
+    <section class="paper pad" aria-label="Classement">
+      <h2 class="card-t">Le classement de ce téléphone</h2>
+      ${rows ? `<ul class="team">${rows}</ul>
+      <p class="led-key"><span><i class="hi"></i>70 et plus</span><span><i class="mid"></i>45 à 69</span><span><i class="lo"></i>moins de 45</span><span><i></i>pas encore joué</span></p>` : `<p class="muted gap-t">${fr('Personne n’a encore joué sur ce téléphone.')}</p>`}
+      <div class="add-form">${nameForm('player-name-team', 'Ajouter un joueur', 'Ajouter')}</div>
+    </section>
+    <section class="paper pad wa" aria-label="Envoyer mon bilan">
+      <h2 class="card-t">${pl ? esc('Le bilan de ' + pl.name) : 'Ton bilan'}</h2>
+      <p class="muted">${fr('Envoie-le au responsable après chaque séance : c’est comme ça qu’il suit toute l’équipe.')}</p>
+      ${sendBlock}
+    </section>
+    <section class="paper pad" aria-label="Installer sur un téléphone">
+      <h2 class="card-t">Mettre le jeu sur un téléphone</h2>
+      <div class="install-now"><button type="button" class="btn led install-btn" data-install hidden>Installer l’application</button><p class="installed-msg" hidden>Le jeu est installé sur ce téléphone.</p></div>
+      <div class="install-grid">
+        <div><h3>Android (Chrome)</h3><ol>
+          <li>${fr('Ouvre le lien du jeu dans Chrome.')}</li>
+          <li>${fr('Touche les trois points, en haut à droite.')}</li>
+          <li>${fr('Choisis « Installer l’application » ou « Ajouter à l’écran d’accueil ».')}</li>
+        </ol></div>
+        <div><h3>iPhone (Safari)</h3><ol>
+          <li>${fr('Ouvre le lien du jeu dans Safari.')}</li>
+          <li>${fr('Touche le bouton Partager, le carré avec une flèche.')}</li>
+          <li>${fr('Choisis « Sur l’écran d’accueil », puis « Ajouter ».')}</li>
+        </ol></div>
+      </div>
+      <p>${fr('L’icône apparaît sur l’écran d’accueil : un seul toucher ouvre le jeu, comme une application, même sans Internet après la première ouverture. Si le lien s’ouvre dans une autre application, ouvre-le d’abord dans Chrome ou Safari.')}</p>
+      <p class="note">${fr('Les scores restent sur le téléphone. Si on efface les données du navigateur, ils partent aussi : pense à envoyer ton bilan.')}</p>
+    </section>
+  </article>`;
+}
+
+/* ---------- La méthode ---------- */
+function methodHTML(){
+  const vcards = VORDER.map(k => `<div class="paper vcard"><span class="stamp ${VERDICTS[k].cls}">${VERDICTS[k].stamp}</span><p>${fr(VERDICTS[k].desc)}</p><p class="then">${fr(VERDICTS[k].then)}</p></div>`).join('');
+  const steps = STEPS.map(s => `<li><b>${fr(s[0])}</b><p>${fr(s[1])}</p></li>`).join('');
+  const rules = RULES.map(r => `<li><b>${fr(r[0])}</b><span>${fr(r[1])}</span></li>`).join('');
+  const signs = SIGNS.map(s => `<li><span>${fr(s[0])}</span><span class="s-mean">${fr(s[1])}</span><span class="who ${VERDICTS[s[2]].cls}">${VERDICTS[s[2]].label}</span></li>`).join('');
+  const how = GROUPS.map(g => `<div class="how-g"><h3>${g.name}</h3><div class="howto">${ACTIONS.filter(a => a.g === g.id).map(a => `<div><b>${fr(a.name)}</b><p>${fr(a.how)}</p></div>`).join('')}</div></div>`).join('');
+  const lex = LEXIQUE.map(l => `<dt>${fr(l[0])}</dt><dd>${fr(l[1])}</dd>`).join('');
+  return `<article class="doc">
+    <header class="doc-head"><p class="kicker">La méthode</p><h1>${fr('Juger une panne, preuve à l’appui')}</h1><p class="lead">${fr('Chez NouR’s Market, le client teste sa machine avant de payer. Quand il revient, la question est toujours la même : ce défaut existait-il quand la machine est partie, ou vient-il de ce qui s’est passé après ?')}</p></header>
+    <section><h2>Les trois verdicts</h2><div class="vcards">${vcards}</div><p class="callout"><b>${fr('Pas de preuve, pas de refus.')}</b> ${fr('Si tu ne peux pas montrer ce qui rend le client responsable, la boutique prend en charge. Le doute profite au client, et à la réputation de la boutique.')}</p></section>
+    <section><h2>Les six étapes au comptoir</h2><ol class="steps">${steps}</ol></section>
+    <section><h2>Les règles d’or</h2><ul class="dashed-cards">${rules}</ul></section>
+    <section><h2>Ce que tu vois, ce que ça veut dire</h2><ul class="signs"><li class="s-head"><span>Ce que tu constates</span><span>Ce que ça veut dire</span><span>Qui prend en charge</span></li>${signs}</ul></section>
+    <section><h2>Les tests, en vrai</h2>${how}</section>
+    <section><h2>Petit lexique</h2><dl class="lex">${lex}</dl></section>
+  </article>`;
+}
+
+/* ---------- Fiche de livraison ---------- */
+function ficheTabHTML(){
+  let n = 0;
+  const groups = CHECK.map(g => `<h3>${fr(g[0])}</h3><ul class="chk-list">${g[1].map(t => { n++; return `<li><label><input type="checkbox" class="chk" id="chk-${n}"><span>${fr(t)}</span></label></li>`; }).join('')}</ul>`).join('');
+  return `<article class="doc">
+    <header class="doc-head"><p class="kicker">Fiche de livraison</p><h1>Le litige se gagne le jour de la livraison</h1><p class="lead">${fr('Ce que tu notes avant de livrer est ta seule preuve de l’état de la machine. Sans fiche, impossible de dire si un défaut existait déjà. Coche chaque point, pour chaque machine.')}</p></header>
+    <section class="paper pad checklist" aria-label="Liste de contrôle">
+      <div class="chk-head"><h2>Avant chaque livraison</h2><span class="chk-count" id="chk-count">0/${n}</span></div>
+      ${groups}
+      <div class="chk-foot"><button type="button" class="btn ghost sm" data-uncheck>Tout décocher pour la machine suivante</button></div>
+    </section>
+    <section class="paper pad wa">
+      <h2 class="card-t">Le message à envoyer après la livraison</h2>
+      <p class="muted">${fr('Remplace ce qui est entre crochets, joins les 4 photos, et garde la réponse du client : c’est ta preuve datée.')}</p>
+      <div class="wa-msg" id="wa-text">${esc(WA_TEXT)}</div>
+      <button type="button" class="btn primary" data-copy>Copier le message</button>
+    </section>
+  </article>`;
+}
+function updateChecklist(){
+  const boxes = document.querySelectorAll('.chk');
+  const done = Array.prototype.filter.call(boxes, b => b.checked).length;
+  const el = $('#chk-count');
+  if (el) el.textContent = done + '/' + boxes.length;
+}
+function copyText(text, btn, label, holderId){
+  const reset = () => setTimeout(() => { if (document.body.contains(btn)) btn.textContent = label; }, 2500);
+  const fallback = () => {
+    const el = document.getElementById(holderId);
+    if (el){ const range = document.createRange(); range.selectNodeContents(el); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+    btn.textContent = 'Texte sélectionné : copiez-le';
+    reset();
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copié'; reset(); }, fallback);
+    } else fallback();
+  } catch (e) { fallback(); }
+}
+
+/* ---------- Navigation ---------- */
+function startCase(id){
+  if (!me()){ ui.tab = 'jouer'; renderApp(); return; }
+  if (!caseById(id)){ ui.view = 'home'; renderApp(); return; }
+  run = newRun(id);
+  ui.tab = 'jouer';
+  ui.view = 'case';
+  renderApp();
+  window.scrollTo(0, 0);
+}
+function setTab(tab){
+  closeSheet();
+  ui.tab = tab;
+  try { history.replaceState(null, '', '#' + tab); } catch (e) {}
+  renderApp();
+  window.scrollTo(0, 0);
+}
+function goHome(){ ui.tab = 'jouer'; ui.view = 'home'; renderApp(); window.scrollTo(0, 0); }
+function doAction(aid){
+  const c = cur();
+  if (!c) return;
+  lastAct = aid;
+  const known = run.done[aid];
+  const entry = known ? run.log[known.idx] : applyAction(run, c, aid);
+  if (!known) renderApp();
+  openResult(entry);
+}
+function arm(btn, key, armedLabel, restLabel, onConfirm){
+  if (btn.classList.contains('armed')){ clearTimeout(armTimers[key]); onConfirm(); return; }
+  btn.classList.add('armed');
+  btn.textContent = armedLabel;
+  clearTimeout(armTimers[key]);
+  armTimers[key] = setTimeout(() => { if (document.body.contains(btn)){ btn.classList.remove('armed'); btn.textContent = restLabel; } }, 4000);
+}
+
+/* ---------- Événements ---------- */
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('button');
+  if (!t) return;
+  const d = t.dataset;
+  if (d.tab){ setTab(d.tab); return; }
+  if (d.start){ startCase(Number(d.start)); return; }
+  if (d.nav === 'home'){ goHome(); return; }
+  if (d.act){ doAction(d.act); return; }
+  if ('openVerdict' in d){ openVerdict(); return; }
+  if ('players' in d){ openPlayers(); return; }
+  if ('close' in d){ closeSheet(); return; }
+  if (d.pick && vstate){ vstate.verdict = d.pick; renderVerdict(); return; }
+  if ('vnext' in d && vstate && vstate.verdict){ vstate.step = 2; renderVerdict(); return; }
+  if ('vback' in d && vstate){ vstate.step = 1; renderVerdict(); return; }
+  if ('vconfirm' in d && vstate){ confirmVerdict(); return; }
+  if (d.switch){ switchPlayer(d.switch); closeSheet(); ui.tab = 'jouer'; renderApp(); window.scrollTo(0, 0); return; }
+  if (d.del){
+    const pl = store.players.find(p => p.id === d.del);
+    if (pl) arm(t, 'del-' + d.del, 'Confirmer : supprimer ' + pl.name, 'Supprimer', () => { deletePlayer(d.del); renderApp(); });
+    return;
+  }
+  if ('install' in d){ askInstall(); return; }
+  if ('copy' in d){ copyText(WA_TEXT, t, 'Copier le message', 'wa-text'); return; }
+  if ('copyBilan' in d){ const pl = me(); if (pl) copyText(bilanText(pl.id), t, 'Copier le bilan', 'bilan-text'); return; }
+  if ('uncheck' in d){ document.querySelectorAll('.chk').forEach(b => { b.checked = false; }); updateChecklist(); return; }
+  if ('reset' in d){ arm(t, 'reset', 'Confirmer l’effacement', 'Effacer ma progression', () => { store.progress[store.current] = {}; saveStore(); renderApp(); }); return; }
+});
+document.addEventListener('submit', ev => {
+  const f = ev.target;
+  if (!f.matches || !f.matches('[data-form="add"]')) return;
+  ev.preventDefault();
+  const input = f.querySelector('input[name="pname"]');
+  const err = f.querySelector('.form-err');
+  const res = checkName(store, input ? input.value : '');
+  if (res.err){ if (err) err.textContent = res.err; if (input) input.focus(); return; }
+  addPlayer(res.name);
+  closeSheet();
+  ui.tab = 'jouer';
+  renderApp();
+  window.scrollTo(0, 0);
+});
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.name === 'ev' && vstate){ vstate.evidence = t.value; const b = $('[data-vconfirm]'); if (b) b.disabled = false; return; }
+  if (t.classList && t.classList.contains('chk')) updateChecklist();
+});
+const sheet = $('#sheet');
+sheet.addEventListener('close', onSheetClosed);
+sheet.addEventListener('click', ev => { if (ev.target === sheet) closeSheet(); });
+
+/* ---------- Application installable ---------- */
+let installEvt = null;
+function isStandalone(){
+  try { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; } catch (e) { return false; }
+}
+function syncInstall(){
+  const installed = isStandalone();
+  document.querySelectorAll('.install-btn').forEach(b => { b.hidden = !installEvt || installed; });
+  document.querySelectorAll('.installed-msg').forEach(p => { p.hidden = !installed; });
+}
+function askInstall(){
+  if (!installEvt) return;
+  const evt = installEvt;
+  evt.prompt();
+  Promise.resolve(evt.userChoice).catch(() => null).then(() => { installEvt = null; syncInstall(); });
+}
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; syncInstall(); });
+window.addEventListener('appinstalled', () => { installEvt = null; syncInstall(); });
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+
+/* ---------- Démarrage ---------- */
+function snapshot(){ return {store:store, ui:{tab:ui.tab, view:ui.view}, run:run}; }
+function start(data){
+  data = data || {};
+  store = (data.store && Array.isArray(data.store.players)) ? normalizeStore(data.store) : loadStore();
+  if (data.run && data.run.caseId && caseById(data.run.caseId)) run = data.run;
+  if (data.ui){ ui.tab = data.ui.tab || 'jouer'; ui.view = data.ui.view || 'home'; }
+  else {
+    const h = (location.hash || '').slice(1);
+    if (h === 'jouer' || h === 'methode' || h === 'fiche' || h === 'equipe') ui.tab = h;
+  }
+  renderApp();
+}
+const hot = window.claude && window.claude.hot;
+try { if (hot && typeof hot.snapshot === 'function') hot.snapshot(snapshot); } catch (e) {}
+if (hot && typeof hot.ready === 'function') hot.ready(start);
+else start(hot && hot.data ? hot.data : {});
+})();
+</script>
+
+</body>
+</html>

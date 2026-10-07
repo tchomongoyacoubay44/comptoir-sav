@@ -1,0 +1,30 @@
+{
+  "name": "Comptoir SAV NouR’s",
+  "short_name": "Comptoir SAV",
+  "description": "Jeu de formation au diagnostic SAV : décider, preuve à l’appui, si une panne est pour le vendeur, pour le client, ou s’il n’y a aucune panne.",
+  "lang": "fr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E5EBEC",
+  "theme_color": "#1B5560",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
